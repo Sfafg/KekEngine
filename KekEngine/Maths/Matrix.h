@@ -5,8 +5,20 @@
 template <unsigned int Rows, unsigned int Columns = 1, typename T = float>
 struct Matrix
 {
-	int rows() { return sizeof(value) / sizeof(value[0]); }
-	int columns() { return value[0].size(); }
+	int rows() const { return sizeof(value) / sizeof(value[0]); }
+	int columns() const { return value[0].size(); }
+	void Transpose()
+	{
+		for(int i = 0; i < Rows; i++)
+		{
+			for(int j = i + 1; j < Columns; j++)
+			{
+				T temp = value[i][j];
+				value[i][j] = value[j][i];
+				value[j][i] = temp;
+			}
+		}
+	}
 
 #pragma region OPERATORS
 	template <unsigned int ORows, unsigned int OColumns, typename OT>
@@ -282,6 +294,12 @@ struct Matrix3x3 : public Matrix<3, 3>
 
 namespace Matrices
 {
+	template <unsigned int Rows, unsigned int Columns = 1, typename T = float>
+	Matrix<Rows, Columns, T> Transpose(Matrix<Rows, Columns, T> mat)
+	{
+		mat.Transpose();
+		return mat;
+	}
 	Matrix3x3 pivot(vec2f pivot, vec2f scale, float rotation)
 	{
 		Matrix3x3 mat = Matrix3x3();
