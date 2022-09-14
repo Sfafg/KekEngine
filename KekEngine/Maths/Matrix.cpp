@@ -110,23 +110,11 @@ mat3x3::mat3x3(vec3f a, vec3f b, vec3f c, vec3f d)
 vec2f mat3x3::TransformVector(vec3f a) const
 {
 	a.z = 1;
-	Log(*this);
-	Log("[{Red}]<*>");
-	Log(mat<3>(a));
-	Log("[{Red}]<=>");
-	Log((*this * mat<3>(a)));
 	return (vec<3>)(*this * mat<3>(a));
 }
 vec2f mat3x3::TransformDir(vec3f a) const
 {
 	a.z = 0;
-
-	Log(*this);
-	Log("[{Red}]<*>");
-	Log(mat<3>(a));
-	Log("[{Red}]<=>");
-	Log((vec<3>)(*this * mat<3>(a)));
-
 	return (vec<3>)(*this * mat<3>(a));
 }
 

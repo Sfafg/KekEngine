@@ -38,11 +38,11 @@ class Transform2D
 
 	vec2f Right()
 	{
-		return GetMatrix().TransformVector({ 1,0,0 });
+		return GetMatrix().TransformDir({ 1,0 });
 	}
 	vec2f Up()
 	{
-		return GetMatrix().TransformVector({ 0,1 });
+		return GetMatrix().TransformDir({ 0,1 });
 	}
 };
 

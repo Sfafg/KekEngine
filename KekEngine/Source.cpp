@@ -6,8 +6,6 @@
 int main()
 {
 	Transform2D tr({ 10,20 }, { 4,1 });
-	tr.Up();
-	Log('\n');
-	tr.Right();
+
 	return 0;
 }
