@@ -1,33 +1,18 @@
 #pragma once
-class Byte
+struct Byte
 {
-	char value = 0;
-public:
-	void SetBit(int position, bool state)
-	{
-		if (state)value |= 1 << position;
-		else value &= ~(1 << position);
-	}
-	bool GetBit(int position) const
-	{
-		return ((value >> position) & 1) == 1;
-	}
+	void Write(int position, bool state);
+	void Set(int position);
+	void Unset(int position);
+	void Toggle(int position);
+	bool Get(int position) const;
 
-	Byte(int value = 0) :value(value)
-	{}
-	Byte(Byte const& o)
-	{
-		value = o.value;
-	}
-	operator char() { return value; }
+	Byte(unsigned char value = 0);
+	operator unsigned char& ();
+
+	private:
+	unsigned char value = 0;
+	friend std::ostream& operator<<(std::ostream& os, const Byte& o);
 };
-std::ostream& operator<<(std::ostream& os, const Byte& o)
-{
-	for (int i = sizeof(o) * 8 - 1; i >= 0; i--)
-	{
-		if (o.GetBit(i))os << '1';
-		else os << '0';
-	}
-	return os;
-}
 
+std::ostream& operator<<(std::ostream& os, const Byte& o);

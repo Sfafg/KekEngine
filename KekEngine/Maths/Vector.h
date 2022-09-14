@@ -2,312 +2,209 @@
 #include <iostream>
 #include "Math.h"
 
-namespace
+// Syntax trick to get x, y, z, w aliases for array values
+template <unsigned int TSize, typename T> struct vec_union { vec_union() {}T value[TSize]; };
+template <typename T> struct vec_union<2, T> { vec_union() {} union { T value[2]; struct { T x, y; }; }; };
+template <typename T> struct vec_union<3, T> { vec_union() {} union { T value[3]; struct { T x, y, z; }; }; };
+template <typename T> struct vec_union<4, T> { vec_union() {} union { T value[4]; struct { T x, y, z, w; }; }; };
+
+template <unsigned int TSize, typename T = float>
+struct vec : public vec_union<TSize, T>
 {
-	template <int size, typename T>
-	struct vec_union
+	int Size() { return TSize; }
+	float Mag() const
 	{
-		public:
-		vec_union() {};
-		vec_union(T* data) { memcpy((void*)&value[0], data, size * sizeof(T)); }
-		vec_union(T const (&data)[size]) { memcpy((void*)&value[0], data, size * sizeof(T)); }
-		T value[size];
-	};
-
-	template <typename T>
-	struct vec_union<2, T>
-	{
-		public:
-		vec_union() {};
-		vec_union(T* data) { memcpy((void*)&value[0], data, 2 * sizeof(T)); }
-		vec_union(T const (&data)[2]) { memcpy((void*)&value[0], data, 2 * sizeof(T)); }
-		union { T value[2]; struct { T x, y; }; };
-	};
-	template <typename T>
-	struct vec_union<3, T>
-	{
-		public:
-		vec_union() {};
-		vec_union(T* data) { memcpy((void*)&value[0], data, 3 * sizeof(T)); }
-		vec_union(T const (&data)[3]) { memcpy((void*)&value[0], data, 3 * sizeof(T)); }
-		union { T value[3]; struct { T x, y, z; }; };
-	};
-	template <typename T>
-	struct vec_union<4, T>
-	{
-		public:
-		vec_union() {};
-		vec_union(T* data) { memcpy((void*)&value[0], data, 4 * sizeof(T)); }
-		vec_union(T const (&data)[4]) { memcpy((void*)&value[0], data, 4 * sizeof(T)); }
-		union { T value[4]; struct { T x, y, z, w; }; };
-	};
-}
-
-template <unsigned int Size, typename T = float>
-struct vec : public vec_union<Size, T>
-{
-	float Mag()
-	{
-		int total = 0;
-		for(T& v : this->value) total += v * v;
-
-		return total;
+		float mag = 0;
+		for(const T& v : this->value) mag += v * v;
+		return mag;
 	}
-	float Lenght()
+	float Length() const { return Math::Sqrt(Mag()); }
+	vec<TSize, T> Normalize() { float l = Length(); if(l != 0) *this /= l; return *this; }
+	vec<TSize, T> Round() { for(T& v : this->value) v = Math::Round(v); return *this; }
+	vec<TSize, T> Ceil() { for(T& v : this->value) v = Math::Ceil(v); return *this; }
+	vec<TSize, T> Abs() { for(T& v : this->value) v = Math::Abs(v);  return *this; }
+	vec<TSize, T> Sign() { for(T& v : this->value) v = Math::Sign(v); return *this; }
+	vec<TSize, T> Clamp(vec<TSize, T> min, vec<TSize, T> max)
 	{
-		return Math::Sqrt(Mag());
+		for(int i = 0; i < TSize; i++)
+			operator[](i) = Math::Clamp(operator[](i), min[i], max[i]);
+		return *this;
 	}
-	void Normalize()
+	vec<TSize, T> Wrap(vec<TSize, T> min, vec<TSize, T> max)
 	{
-		float l = Lenght();
-		if(l == 0)return;
-
-		l = 1.0f / l;
-		for(T& v : this->value) v *= l;
+		for(int i = 0; i < TSize; i++)
+			operator[](i) = Math::Wrap(operator[](i), min[i], max[i]);
+		return *this;
 	}
 
-	void Wrap(vec<Size, T> min, vec<Size, T> max)
+	void operator += (const T& v) { for(T& val : this->value) val += v; }
+	void operator -= (const T& v) { for(T& val : this->value) val -= v; }
+	void operator *= (const T& v) { for(T& val : this->value) val *= v; }
+	void operator /= (const T& v) { for(T& val : this->value) val /= v; }
+
+	void operator += (const vec<TSize, T>& v) { for(int i = 0; i < TSize; i++) operator[](i) += v[i]; }
+	void operator -= (const vec<TSize, T>& v) { for(int i = 0; i < TSize; i++) operator[](i) -= v[i]; }
+	void operator *= (const vec<TSize, T>& v) { for(int i = 0; i < TSize; i++) operator[](i) *= v[i]; }
+	void operator /= (const vec<TSize, T>& v) { for(int i = 0; i < TSize; i++) operator[](i) /= v[i]; }
+
+	vec<TSize, T> operator + (const T& v) const { vec<TSize, T> vec(*this); vec += v; return vec; }
+	vec<TSize, T> operator - (const T& v) const { vec<TSize, T> vec(*this); vec -= v; return vec; }
+	vec<TSize, T> operator * (const T& v) const { vec<TSize, T> vec(*this); vec *= v; return vec; }
+	vec<TSize, T> operator / (const T& v) const { vec<TSize, T> vec(*this); vec /= v; return vec; }
+
+	vec<TSize, T> operator + (const vec<TSize, T>& v) const { vec<TSize, T> vec(*this); vec += v; return vec; }
+	vec<TSize, T> operator - (const vec<TSize, T>& v) const { vec<TSize, T> vec(*this); vec -= v; return vec; }
+	vec<TSize, T> operator * (const vec<TSize, T>& v) const { vec<TSize, T> vec(*this); vec *= v; return vec; }
+	vec<TSize, T> operator / (const vec<TSize, T>& v) const { vec<TSize, T> vec(*this); vec /= v; return vec; }
+
+	vec<TSize, T> operator - () const { vec<TSize, T> vec(*this);  for(T& val : vec.value) val = -val; return vec; }
+
+	bool operator ==(const T& v) const { for(T& val : this->value) if(val != v) return false; return true; }
+	bool operator !=(const T& v) const { for(T& val : this->value) if(val == v) return false; return true; }
+	bool operator < (const T& v) const { for(T& val : this->value) if(val >= v) return false; return true; }
+	bool operator > (const T& v) const { for(T& val : this->value) if(val <= v) return false; return true; }
+	bool operator <=(const T& v) const { for(T& val : this->value) if(val > v) return false; return true; }
+	bool operator >=(const T& v) const { for(T& val : this->value) if(val < v) return false; return true; }
+
+	bool operator == (const vec<TSize, T>& v) const { for(int i = 0; i < TSize; i++) if(operator[](i) != v[i]) return false; return true; }
+	bool operator != (const vec<TSize, T>& v) const { for(int i = 0; i < TSize; i++) if(operator[](i) == v[i]) return false; return true; }
+	bool operator <  (const vec<TSize, T>& v) const { for(int i = 0; i < TSize; i++) if(operator[](i) >= v[i]) return false; return true; }
+	bool operator >  (const vec<TSize, T>& v) const { for(int i = 0; i < TSize; i++) if(operator[](i) <= v[i]) return false; return true; }
+	bool operator <= (const vec<TSize, T>& v) const { for(int i = 0; i < TSize; i++) if(operator[](i) > v[i]) return false; return true; }
+	bool operator >= (const vec<TSize, T>& v) const { for(int i = 0; i < TSize; i++) if(operator[](i) < v[i]) return false; return true; }
+
+	T& operator[](unsigned int index) { return this->value[index]; }
+	const T& operator[](unsigned int index) const { return this->value[index]; }
+	operator T* () { return &(this->value[0]); }
+	operator const T* () const { return &(this->value[0]); }
+
+	vec() {}
+	vec(T data) { for(T& v : this->value) v = data; }
+	vec(T const (&data)[TSize]) { memcpy(this->value, data, sizeof(T) * TSize); }
+	vec(std::initializer_list<T> data) { memcpy(this->value, data.begin(), sizeof(T) * TSize); }
+
+	template <unsigned int OTSize, typename OT>
+	void operator =(const vec<OTSize, OT>& o)
 	{
-		for(int i = 0; i < size; i++)
-			this->value[i] = Math::Clamp(this->value[i], min[i], max[i]);
+		constexpr int min = OTSize < TSize ? OTSize : TSize;
+		for(int i = 0; i < min; i++) (*this)[i] = o[i];
 	}
-	void Clamp(vec<Size, T> min, vec<Size, T> max)
+	template <unsigned int OTSize, typename OT>
+	vec(const vec<OTSize, OT>& o)
 	{
-		for(int i = 0; i < size; i++)
-			this->value[i] = Math::Clamp(this->value[i], min[i], max[i]);
-	}
-
-	int size() { return sizeof(this->value) / sizeof(this->value[0]); }
-#pragma region OPERATORS
-	void operator += (vec<Size, T> const& o) { for(int i = 0; i < Size; i++) this->value[i] += o[i]; }
-	void operator -= (vec<Size, T> const& o) { for(int i = 0; i < Size; i++) this->value[i] -= o[i]; }
-	void operator *= (vec<Size, T> const& o) { for(int i = 0; i < Size; i++) this->value[i] *= o[i]; }
-	void operator /= (vec<Size, T> const& o) { for(int i = 0; i < Size; i++) this->value[i] /= o[i]; }
-	void operator  = (vec<Size, T> const& o) { for(int i = 0; i < Size; i++) this->value[i] = o[i]; }
-
-	void operator += (T const& o) { for(T& v : this->value) v += o; }
-	void operator -= (T const& o) { for(T& v : this->value) v -= o; }
-	void operator *= (T const& o) { for(T& v : this->value) v *= o; }
-	void operator /= (T const& o) { for(T& v : this->value) v /= o; }
-	void operator  = (T const& o) { for(T& v : this->value) v = o; }
-
-	vec<Size, T> operator + (vec<Size, T> const& o) { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = this->value[i] + o[i]; return temp; }
-	vec<Size, T> operator - (vec<Size, T> const& o) { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = this->value[i] - o[i]; return temp; }
-	vec<Size, T> operator * (vec<Size, T> const& o) { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = this->value[i] * o[i]; return temp; }
-	vec<Size, T> operator / (vec<Size, T> const& o) { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = this->value[i] / o[i]; return temp; }
-
-	vec<Size, T> operator + (T const& o) { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = this->value[i] + o; return temp; }
-	vec<Size, T> operator - (T const& o) { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = this->value[i] - o; return temp; }
-	vec<Size, T> operator * (T const& o) { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = this->value[i] * o; return temp; }
-	vec<Size, T> operator / (T const& o) { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = this->value[i] / o; return temp; }
-
-	vec<Size, T> operator - () { vec<Size, T> temp; for(int i = 0; i < Size; i++) temp[i] = -this->value[i]; return temp; }
-
-	bool operator < (vec<Size, T> const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] < o[i]; if(!is)break; } return is; }
-	bool operator > (vec<Size, T> const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] > o[i]; if(!is)break; } return is; }
-	bool operator <= (vec<Size, T> const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] <= o[i]; if(!is)break; } return is; }
-	bool operator >= (vec<Size, T> const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] >= o[i]; if(!is)break; } return is; }
-	bool operator == (vec<Size, T> const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] == o[i]; if(!is)break; } return is; }
-	bool operator != (vec<Size, T> const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] != o[i]; if(!is)break; } return is; }
-
-	bool operator < (T const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] < o; if(!is)break; } return is; }
-	bool operator > (T const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] > o; if(!is)break; } return is; }
-	bool operator <= (T const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] <= o; if(!is)break; } return is; }
-	bool operator >= (T const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] >= o; if(!is)break; } return is; }
-	bool operator == (T const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] == o; if(!is)break; } return is; }
-	bool operator != (T const& o) { bool is = false; for(int i = 0; i < Size; i++){ is = this->value[i] != o; if(!is)break; } return is; }
-
-	T& operator[](int index) { return this->value[index]; }
-	const T& operator[](int index) const { return this->value[index]; }
-
-	T* operator &() { return &(this->value[0]); }
-	explicit operator T* () { return &(this->value[0]); }
-	explicit operator const T* () { return &(this->value[0]); }
-#pragma endregion
-
-	vec(T a = 0.f)
-	{
-		for(int i = 0; i < Size; i++) this->value[i] = a;
-	}
-	vec(T* data) : vec_union<Size, T>(data) {}
-	vec(T const (&data)[Size]) : vec_union<Size, T>(data) {}
-
-	template <unsigned int Osize, typename OT>
-	vec(const vec<Osize, OT>& o)
-	{
+		constexpr int min = OTSize < TSize ? OTSize : TSize;
 		int i = 0;
-		for(i; i < Math::Min<unsigned int>(Size, Osize); i++)
-			this->value[i] = o[i];
-		for(i; i < Size; i++) this->value[i] = 0;
+		for(i; i < min; i++)(*this)[i] = o[i];
+
+		constexpr int max = OTSize > TSize ? OTSize : TSize;
+		for(i; i < max; i++)(*this)[i] = 0;
 	}
-
-	template <unsigned int Size, typename T>
-	friend std::ostream& operator<<(std::ostream&, const vec<Size, T>&);
 };
-
-template <unsigned int size, typename T>
-std::ostream& operator<<(std::ostream& os, const vec<size, T>& o)
+template <unsigned int TSize, typename T>
+std::ostream& operator<<(std::ostream& os, const vec<TSize, T>& o)
 {
-	os << "vec" << size << typeid(T).name()[0] << "(";
+	os << "[{LCyan}]<vec" << TSize << typeid(T).name()[0] << ">[{LYellow}]<(";
 
-	for(int i = 0; i < size - 1; i++)
-		os << o.value[i] << ", ";
+	for(int i = 0; i < TSize - 1; i++) os << o.value[i] << ", ";
 
-	os << o.value[size - 1] << ") ";
+	os << o.value[TSize - 1] << ")> ";
 
 	return os;
 }
 
-struct vec2f : public vec<2, float>
-{
-	vec2f(float x = 0, float y = 0) : vec({ x, y }) {}
-
-	template <unsigned int Osize, typename OT>
-	vec2f(const vec<Osize, OT>& o) { for(int i = 0; i < Math::Min<unsigned int>(2, Osize); i++) this->value[i] = o[i]; }
-};
-struct vec2i : public vec<2, int>
-{
-	vec2i(int x = 0, int y = 0) : vec({ x, y }) {}
-
-	template <unsigned int Osize, typename OT>
-	vec2i(const vec<Osize, OT>& o) { for(int i = 0; i < Math::Min<unsigned int>(2, Osize); i++) this->value[i] = o[i]; }
-};
-struct vec3f : public vec<3, float>
-{
-	vec3f(float x = 0, float y = 0, float z = 0) : vec({ x, y, z }) {}
-
-	template <unsigned int Osize, typename OT>
-	vec3f(const vec<Osize, OT>& o) { for(int i = 0; i < Math::Min<unsigned int>(3, Osize); i++) this->value[i] = o[i]; }
-};
-struct vec4f : public vec<4, float>
-{
-	vec4f(float x = 0, float y = 0, float z = 0, float w = 0) : vec({ x,y,z ,w }) {}
-	vec4f(vec3f a, float w_ = 0) : vec({ a.x, a.y, a.z, w }) {}
-
-	template <unsigned int Osize, typename OT>
-	vec4f(const vec<Osize, OT>& o) { for(int i = 0; i < Math::Min<unsigned int>(4, Osize); i++) this->value[i] = o[i]; }
-};
-
 namespace Vector
 {
-	template <unsigned int size>
-	vec<size, int> Round(vec<size, float> const& a)
-	{
-		int temp[size];
-		for(int i = 0; i < size; i++) temp[i] = Math::Round(a[i]);
+	template <unsigned int TSize, typename T> vec<TSize, T> Length(vec<TSize, T> v) { return v.Length(); }
+	template <unsigned int TSize, typename T> vec<TSize, T> Distance(vec<TSize, T> v, vec<TSize, T> v1) { return Length(v - v1); }
 
-		return vec<size, int>(temp);
-	}
-	template <unsigned int size>
-	vec<size, int> Ceil(vec<size, float> const& a)
-	{
-		int temp[size];
-		for(int i = 0; i < size; i++) temp[i] = Math::Ceil(a[i]);
+	template <unsigned int TSize, typename T> vec<TSize, T> Normalize(vec<TSize, T> v) { return v.Normalize(); }
+	template <unsigned int TSize, typename T> vec<TSize, T> Round(vec<TSize, T> v) { return v.Round(); }
+	template <unsigned int TSize, typename T> vec<TSize, T> Ceil(vec<TSize, T> v) { return v.Ceil(); }
+	template <unsigned int TSize, typename T> vec<TSize, T> Abs(vec<TSize, T> v) { return v.Abs(); }
+	template <unsigned int TSize, typename T> vec<TSize, T> Sign(vec<TSize, T> v) { return v.Sign(); }
+	template <unsigned int TSize, typename T> vec<TSize, T> Clamp(vec<TSize, T> v, const vec<TSize, T>& min, const vec<TSize, T>& max) { return v.Clamp(min, max); }
+	template <unsigned int TSize, typename T> vec<TSize, T> Wrap(vec<TSize, T> v, const vec<TSize, T>& min, const vec<TSize, T>& max) { return v.Wrap(min, max); }
+	template <unsigned int TSize, typename T> vec<TSize, T> Lerp(const vec<TSize, T>& a, const vec<TSize, T>& b, float k) { return Math::Lerp(a, b, k); }
 
-		return vec<size, int>(temp);
-	}
-	template <unsigned int size, typename T>
-	vec<size, T> Abs(vec<size, T> const& a)
+	template <unsigned int TSize, typename T>
+	float Dot(const vec<TSize, T>& a, const vec<TSize, T>& b)
 	{
-		T temp[size];
-		for(int i = 0; i < size; i++) temp[i] = Math::Abs(a[i]);
-
-		return vec<size, T>(temp);
-	}
-
-	template <unsigned int size, typename T>
-	vec<size, T> Wrap(vec<size, T> a, vec<size, T> const& min, vec<size, T> const& max)
-	{
-		return a.Wrap(min, max);
-	}
-	template <unsigned int size, typename T>
-	vec<size, T> Clamp(vec<size, T> a, vec<size, T> const& min, vec<size, T> const& max)
-	{
-		return a.Clamp(min, max);
-	}
-
-	template <unsigned int size, typename T>
-	float Mag(vec<size, T> const& a) { return a.Mag(); }
-	template <unsigned int size, typename T>
-	float Length(vec<size, T> const& a) { return a.Length(); }
-	template <unsigned int size, typename T>
-	float Dot(vec<size, T> const& a, vec<size, T> const& b)
-	{
-		int sum = 0;
-		for(int i = 0; i < size; i++) sum += a[i] * b[i];
-
+		float sum = 0;
+		for(int i = 0; i < TSize; i++) sum += a[i] * b[i];
 		return sum;
 	}
-	template <unsigned int size, typename T>
-	vec<size, T> Normalize(vec<size, T> a)
-	{
-		a.Normalize();
-		return a;
-	}
 	template <typename T>
-	vec<2, T> Cross(vec<2, T> const& a)
+	vec<2, T> Cross(const vec<2, T>& a)
 	{
 		return vec<2, T>({ -a[1], a[0] });
 	}
 	template <typename T>
-	vec<3, T> Cross(vec<3, T> const& a, vec<3, T> b)
+	vec<3, T> Cross(const vec<3, T>& a, const vec<3, T>& b)
 	{
-		return vec<3, T>({ a[1] * b[2] - a[2] * b[1],a[2] * b[0] - a[0] * b[2],a[0] * b[1] - a[1] * b[0] });
+		return vec<3, T>{a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
 	}
 	template <typename T>
-	vec<3, T> Reflect(vec<3, T> const& k, vec<3, T> nor)
+	vec<3, T> Reflect(const vec<3, T>& k, vec<3, T> nor)
 	{
 		float mag = dot(k, nor) * 2;
 		nor *= mag;
 		nor -= k;
-
 		return nor;
 	}
 
-	template <typename T>
-	float AngleVec(vec<2, T> const& a, vec<2, T> const& b)
+	template <unsigned int TSize, typename T>
+	float Angle(const vec<TSize, T>& a, const vec<TSize, T>& b)
 	{
-		return acos(Dot(a, b) / (a.Lenght() * b.Lengh())) * Math::Sign(Dot(Cross(a), b));
+		return acos(Dot(a, b) / a.Length() * b.Length());
 	}
 	template <typename T>
-	vec<2, T> Polar(float a, float r = 1)
-	{
-		return vec<2, T>({ cos(a) * r, sin(a) * r });
-	}
+	vec<2, T> Polar(float a, float r = 1) { return vec<2, T>({ Math::Cos(a) * r, Math::Sin(a) * r }); }
 	template <typename T>
-	vec<3, T> SphCoord(float azimuth, float theta, float r = 1)
+	vec<3, T> Spherical(float a, float b, float r = 1)
 	{
-		float c = cos(theta * 0.01745329251f) * r;
-		return vec<3, T>({ sin(azimuth * 0.01745329251f) * c, sin(theta * 0.01745329251f) * r, cos(azimuth * 0.01745329251f) * c });
+		float c = Math::Cos(b * 0.01745329251f) * r;
+		return vec<3, T>({ Math::Sin(a * 0.01745329251f) * c, Math::Sin(b * 0.01745329251f) * r, Math::Cos(a * 0.01745329251f) * c });
 	}
 
-	template <int size, typename T>
-	vec<size, T> RVec(vec<size, T> const& min, vec<size, T> const& max)
+	template <unsigned int TSize, typename T>
+	vec<TSize, T> Random(float min = 0, float max = 1)
 	{
-		T temp[size];
-		for(int i = 0; i < size; i++) temp[i] = random(min[i], max[i]);
+		vec<TSize, T> r;
+		for(int i = 0; i < TSize; i++) r[i] = Math::Random(min, max);
+		return r;
+	}
+	template <unsigned int TSize, typename T>
+	vec<TSize, T> Random(const vec<TSize, T>& min, const vec<TSize, T>& max)
+	{
+		vec<TSize, T> r;
+		for(int i = 0; i < TSize; i++) r[i] = Math::Random(min[i], max[i]);
+		return r;
+	}
+	template <unsigned int TSize, typename T>
+	vec<TSize, T> Unit()
+	{
+		return Vector::Random<TSize, T>(-1.0f, 1.0f).Normalize();
+	}
+};
 
-		return vec<size, T>(temp);
-	}
-	template <int size, typename T>
-	vec<size, T> RVec(float min, float max)
-	{
-		T temp[size];
-		for(int i = 0; i < size; i++) temp[i] = Math::Random(min, max);
-
-		return vec<size, T>(temp);
-	}
-	template <int size, typename T>
-	vec<size, T> UVec()
-	{
-		T temp[size];
-		for(int i = 0; i < size; i++) temp[i] = Math::NormalDist(0, 1);
-
-		return Normalize(vec<size, T>(temp));
-	}
-	template <int size, typename T>
-	vec<size, T> SVec(float radius)
-	{
-		return UVec<size, T>() * Math::Random(0, radius);
-	}
-}
+struct vec2f : public vec<2>
+{
+	vec2f();
+	vec2f(float x, float y = 0);
+	template <unsigned int TSize, typename T>
+	vec2f(const vec<TSize, T>& v) : vec(v) {}
+};
+struct vec3f : public vec<3>
+{
+	vec3f();
+	vec3f(float x, float y = 0, float z = 0);
+	template <unsigned int TSize, typename T>
+	vec3f(const vec<TSize, T>& v) : vec(v) {}
+};
+struct vec4f : public vec<4>
+{
+	vec4f();
+	vec4f(float x, float y = 0, float z = 0, float w = 0);
+	template <unsigned int TSize, typename T>
+	vec4f(const vec<TSize, T>& v) : vec(v) {}
+};

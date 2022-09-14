@@ -149,7 +149,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Logging\Console.cpp" />
+    <ClCompile Include="Logging\Log.cpp" />
+    <ClCompile Include="Maths\Byte.cpp" />
+    <ClCompile Include="Maths\Color.cpp" />
+    <ClCompile Include="Maths\Math.cpp" />
+    <ClCompile Include="Maths\Matrix.cpp" />
+    <ClCompile Include="Maths\Vector.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Maths\Transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Logging\Console.h" />
+    <ClInclude Include="Logging\Log.h" />
+    <ClInclude Include="Maths\Math.h" />
+    <ClInclude Include="Maths\Vector.h" />
+    <ClInclude Include="Maths\Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
