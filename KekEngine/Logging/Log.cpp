@@ -136,7 +136,6 @@ FormatData TranslateSequence(const std::string_view& str)
 			int a;
 			ss >> a;
 			formatData.indentionLevel = a;
-			continue;
 		}
 
 		switch(str[i])

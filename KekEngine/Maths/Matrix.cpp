@@ -38,10 +38,10 @@ void mat4x4::Translate(float x, float y, float z)
 {
 	mat4x4 posMat
 	{
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		x,y,z,1
+		1,0,0,x,
+		0,1,0,y,
+		0,0,1,z,
+		0,0,0,1
 	};
 	*this = posMat * *this;
 }
@@ -55,8 +55,8 @@ void mat4x4::RotateX(float a)
 	float Cos = cos(a);
 	mat4x4 rotMat(
 		1, 0, 0, 0,
-		0, Cos, Sin, 0,
-		0, -Sin, Cos, 0,
+		0, Cos, -Sin, 0,
+		0, Sin, Cos, 0,
 		0, 0, 0, 1
 	);
 	*this = rotMat * *this;
@@ -69,9 +69,9 @@ void mat4x4::RotateY(float a)
 	float Sin = sin(a);
 	float Cos = cos(a);
 	mat4x4 rotMat(
-		Cos, 0, -Sin, 0,
+		Cos, 0, Sin, 0,
 		0, 1, 0, 0,
-		Sin, 0, Cos, 0,
+		-Sin, 0, Cos, 0,
 		0, 0, 0, 1
 	);
 	*this = rotMat * *this;
@@ -84,8 +84,8 @@ void mat4x4::RotateZ(float a)
 	float Sin = sin(a);
 	float Cos = cos(a);
 	mat4x4 rotMat(
-		Cos, Sin, 0, 0,
-		-Sin, Cos, 0, 0,
+		Cos, -Sin, 0, 0,
+		Sin, Cos, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	);
@@ -133,9 +133,9 @@ void mat3x3::Translate(float x, float y)
 {
 	mat3x3 posMat
 	{
-		1,0,0,
-		0,1,0,
-		x,y,1
+		1,0,x,
+		0,1,y,
+		0,0,1
 	};
 	*this = posMat * *this;
 }
@@ -148,8 +148,8 @@ void mat3x3::Rotate(float a)
 	float Sin = sin(a);
 	float Cos = cos(a);
 	mat3x3 rotMat(
-		Cos, Sin, 0,
-		-Sin, Cos, 0,
+		Cos, -Sin, 0,
+		Sin, Cos, 0,
 		0, 0, 1
 	);
 	*this = rotMat * *this;
@@ -183,10 +183,10 @@ mat4x4 Matrix::LookAt(vec3f position, vec3f target, vec3f up)
 	vec3f u = Vector::Cross(d, r);
 
 	mat4x4 lookAt(
-		r.x, u.x, d.x, 0,
-		r.y, u.y, d.y, 0,
-		r.z, u.z, d.z, 0,
-		-Vector::Dot(r, position), -Vector::Dot(u, position), -Vector::Dot(d, position), 1
+		r.x, r.y, r.z, -Vector::Dot(r, position),
+		u.x, u.y, u.z, -Vector::Dot(u, position),
+		d.x, d.y, d.z, -Vector::Dot(d, position),
+		0, 0, 0, 1
 	);
 	return lookAt;
 }
@@ -196,16 +196,16 @@ mat4x4 Matrix::Perspective(float ratio, float fov, float near, float far)
 	return mat4x4(
 		1 / s * ratio, 0, 0, 0,
 		0, s, 0, 0,
-		0, 0, -far / (far - near), -1,
-		0, 0, -(far * near) / (far - near), 0
+		0, 0, -far / (far - near), -(far * near) / (far - near),
+		0, 0, -1, 0
 	);
 }
 mat4x4 Matrix::Orthograpic(float left, float right, float bottom, float top, float near, float far)
 {
 	return mat4x4(
-		2 / (right - left), 0, 0, 0,
-		0, -2 / (top - bottom), 0, 0,
-		0, 0, 2 / (far - near), 0,
-		-(right + left) / (right - left), (top + bottom) / (top - bottom), -(far + near) / (far - near), 1
+		2 / (right - left), 0, 0, -(right + left) / (right - left),
+		0, -2 / (top - bottom), 0, (top + bottom) / (top - bottom),
+		0, 0, 2 / (far - near), -(far + near) / (far - near),
+		0, 0, 0, 1
 	);
 }
