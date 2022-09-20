@@ -1,15 +1,7 @@
-﻿#include <iostream>
-#include <string>
-#include "Logging/Log.h"
-#include "Maths/Transform.h"
-
-// Camera Class
-// Rendering
-
+#include <iostream>
+#include "Byte.h"
+#include "Log.h"
 int main()
 {
-	Transform3D tr({ 10,20,5 }, { 4,1 ,12 }, { 10,20,30 });
-	Log(tr);
-
-	return 0;
+	Log(Byte((0x00001111)));
 }
