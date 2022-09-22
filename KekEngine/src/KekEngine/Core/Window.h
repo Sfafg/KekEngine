@@ -1,4 +1,8 @@
 #pragma once
-class Window
+
+namespace Kek
 {
-};
+	class Window
+	{
+	};
+}

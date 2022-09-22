@@ -2,5 +2,5 @@
 
 int main()
 {
-	Log<Error>("Hellow Wrld?");
+	Kek::Log<Kek::Error>("Hellow Wrld?");
 }

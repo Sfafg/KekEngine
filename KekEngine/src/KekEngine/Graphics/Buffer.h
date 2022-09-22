@@ -1,7 +1,9 @@
 #pragma once
-
-class Buffer
+namespace Kek
 {
-	public:
+	class Buffer
+	{
+		public:
 
-};
+	};
+}
