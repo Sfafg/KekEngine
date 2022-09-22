@@ -1,6 +1,5 @@
 #pragma once
-#include <iostream>
-#include <sstream>
+#include <iosfwd>
 #include "Console.h"
 
 /// <summary>

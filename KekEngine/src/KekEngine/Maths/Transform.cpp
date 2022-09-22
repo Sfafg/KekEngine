@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include <iostream>
 
 Transform2D::Transform2D(vec2f position, vec2f scale, float rotation)
 	: position(position), scale(scale), rotation(rotation), matrix()

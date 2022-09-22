@@ -1,4 +1,5 @@
 #pragma once
+#include <iosfwd>
 #include "Matrix.h"
 #include "Byte.h"
 

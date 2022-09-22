@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+#include <iosfwd>
 #include "Vector.h"
 
 template <unsigned int TRows, unsigned int TColumns = 1, typename T = float>

@@ -1,4 +1,5 @@
 #pragma once
+#include <iosfwd>
 #include "Transform.h"
 
 class Camera
