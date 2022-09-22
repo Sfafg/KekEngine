@@ -72,15 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(ProjectDir)ThridParty\GLFW\glfw-3.3.8\Build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(ProjectDir)ThridParty\GLFW\glfw-3.3.8\Build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(ProjectDir)ThridParty\GLFW\glfw-3.3.8\Build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(ProjectDir)ThridParty\GLFW\glfw-3.3.8\Build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -89,11 +93,12 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThridParty\GLAD\glad\include;$(ProjectDir)ThridParty\GLFW\glfw-3.3.8\include\;$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,13 +111,14 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>$(SolutionDir)Graphics\src;$(SolutionDir)Logging\src;$(SolutionDir)Maths\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThridParty\GLAD\glad\include;$(ProjectDir)ThridParty\GLFW\glfw-3.3.8\include\;$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -122,11 +128,12 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThridParty\GLAD\glad\include;$(ProjectDir)ThridParty\GLFW\glfw-3.3.8\include\;$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,28 +146,44 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>$(SolutionDir)Graphics\src;$(SolutionDir)Logging\src;$(SolutionDir)Maths\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThridParty\GLAD\glad\include;$(ProjectDir)ThridParty\GLFW\glfw-3.3.8\include\;$(ProjectDir)src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="src\KekEngine\Core\Console.cpp" />
+    <ClCompile Include="src\KekEngine\Core\Log.cpp" />
+    <ClCompile Include="src\KekEngine\Core\Window.cpp" />
+    <ClCompile Include="src\KekEngine\Graphics\Buffer.cpp" />
+    <ClCompile Include="src\KekEngine\Maths\Byte.cpp" />
+    <ClCompile Include="src\KekEngine\Maths\Camera.cpp" />
+    <ClCompile Include="src\KekEngine\Maths\Color.cpp" />
+    <ClCompile Include="src\KekEngine\Maths\Maths.cpp" />
+    <ClCompile Include="src\KekEngine\Maths\Matrix.cpp" />
+    <ClCompile Include="src\KekEngine\Maths\Transform.cpp" />
+    <ClCompile Include="src\KekEngine\Maths\Vector.cpp" />
+    <ClCompile Include="ThridParty\GLAD\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Graphics\Graphics.vcxproj">
-      <Project>{054973c7-d8dc-4c4f-a6b6-486048e0eccb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Logging\Logging.vcxproj">
-      <Project>{50dc0928-9a2f-490d-909c-e9c2079df731}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Maths\Maths.vcxproj">
-      <Project>{98861049-0e8f-424a-af02-c7c806aa5e93}</Project>
-    </ProjectReference>
+    <ClInclude Include="src\KekEngine\Core\Console.h" />
+    <ClInclude Include="src\KekEngine\Core\Log.h" />
+    <ClInclude Include="src\KekEngine\Core\Window.h" />
+    <ClInclude Include="src\KekEngine\Graphics\Buffer.h" />
+    <ClInclude Include="src\KekEngine\Graphics\Context.h" />
+    <ClInclude Include="src\KekEngine\Maths\Byte.h" />
+    <ClInclude Include="src\KekEngine\Maths\Camera.h" />
+    <ClInclude Include="src\KekEngine\Maths\Color.h" />
+    <ClInclude Include="src\KekEngine\Maths\Maths.h" />
+    <ClInclude Include="src\KekEngine\Maths\Matrix.h" />
+    <ClInclude Include="src\KekEngine\Maths\Transform.h" />
+    <ClInclude Include="src\KekEngine\Maths\Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
