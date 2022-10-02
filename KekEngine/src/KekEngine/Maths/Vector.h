@@ -209,4 +209,26 @@ namespace Kek
 		template <unsigned int TSize, typename T>
 		vec4f(const vec<TSize, T>& v) : vec(v) {}
 	};
+
+	struct vec2i : public vec<2, int>
+	{
+		vec2i();
+		vec2i(int x, int y = 0);
+		template <unsigned int TSize, typename T>
+		vec2i(const vec<TSize, T>& v) : vec(v) {}
+	};
+	struct vec3i : public vec<3, int>
+	{
+		vec3i();
+		vec3i(int x, int y = 0, int z = 0);
+		template <unsigned int TSize, typename T>
+		vec3i(const vec<TSize, T>& v) : vec(v) {}
+	};
+	struct vec4i : public vec<4, int>
+	{
+		vec4i();
+		vec4i(int x, int y = 0, int z = 0, int w = 0);
+		template <unsigned int TSize, typename T>
+		vec4i(const vec<TSize, T>& v) : vec(v) {}
+	};
 }

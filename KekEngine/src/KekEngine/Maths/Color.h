@@ -94,7 +94,7 @@ namespace Kek
 		col(std::initializer_list<T> data) { memcpy(this->value, data.begin(), TSize * sizeof(T)); }
 		col(int v)
 		{
-			float mult = 1.0f;
+			T mult = 1.0f;
 			if constexpr(std::is_floating_point<T>::value) mult = 1.0f / 255.0f;
 
 			if constexpr(TSize >= 1) this->value[0] = ((v >> 16) & 0xFF) * mult;

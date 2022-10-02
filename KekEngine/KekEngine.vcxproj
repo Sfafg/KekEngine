@@ -157,11 +157,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\KekEngine\Core\Monitor.cpp" />
+    <ClCompile Include="src\KekEngine\Core\Flag.cpp" />
+    <ClCompile Include="src\KekEngine\Core\Application.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="src\KekEngine\Core\Console.cpp" />
     <ClCompile Include="src\KekEngine\Core\Log.cpp" />
     <ClCompile Include="src\KekEngine\Core\Window.cpp" />
     <ClCompile Include="src\KekEngine\Graphics\Buffer.cpp" />
+    <ClCompile Include="src\KekEngine\Graphics\Context.cpp" />
     <ClCompile Include="src\KekEngine\Maths\Byte.cpp" />
     <ClCompile Include="src\KekEngine\Maths\Camera.cpp" />
     <ClCompile Include="src\KekEngine\Maths\Color.cpp" />
@@ -172,6 +176,10 @@
     <ClCompile Include="ThridParty\GLAD\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\KekEngine\Core\Monitor.h" />
+    <ClInclude Include="src\KekEngine\Core\Events.h" />
+    <ClInclude Include="src\KekEngine\Core\Flag.h" />
+    <ClInclude Include="src\KekEngine\Core\Application.h" />
     <ClInclude Include="src\KekEngine\Core\Console.h" />
     <ClInclude Include="src\KekEngine\Core\Log.h" />
     <ClInclude Include="src\KekEngine\Core\Window.h" />

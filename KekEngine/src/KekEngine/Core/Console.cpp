@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include "Console.h"
-#include "KekEngine/Maths/Color.h";
-#include "KekEngine/Maths/Byte.h";
+#include "KekEngine/Maths/Color.h"
+#include "KekEngine/Maths/Byte.h"
 
 namespace Kek
 {
@@ -176,7 +176,8 @@ namespace Kek
 	{
 		if(sv.size() == 0) return std::cout;
 
-		int pos = sv.find('\n');
+
+		size_t pos = sv.find('\n');
 		if(pos == -1) pos = sv.size() - 1;
 		pos++;
 
@@ -246,7 +247,7 @@ namespace Kek
 	{
 		if(sv.size() == 0) return ofstream;
 
-		int pos = sv.find('\n');
+		size_t pos = sv.find('\n');
 		if(pos == -1) pos = sv.size() - 1;
 		pos++;
 

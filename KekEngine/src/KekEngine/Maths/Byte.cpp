@@ -9,19 +9,19 @@ namespace Kek
 	}
 	void Byte::Set(int position)
 	{
-		(1 << position) | value;
+		value = (1 << position) | value;
 	}
 	void Byte::Unset(int position)
 	{
-		(value & (~(1 << (position - 1))));
+		value &= ~(1 << position);
 	}
 	void Byte::Toggle(int position)
 	{
-		(value ^ (1 << (position - 1)));
+		value ^= 1 << position;
 	}
 	bool Byte::Get(int position) const
 	{
-		return false;
+		return (value >> position & 1) == 1;
 	}
 	Byte::Byte(unsigned char value) : value(value)
 	{

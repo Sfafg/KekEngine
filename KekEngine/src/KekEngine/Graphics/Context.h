@@ -1,27 +1,14 @@
 #pragma once
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
 namespace Kek
 {
-	namespace OpenGL
+	namespace WindowContext
 	{
-		bool Initialize(int majorVersion, int minorVersion)
-		{
-			if(glfwInit() == GLFW_FALSE)
-			{
-				//Log<Error>("Failed to initialize OpenGL Context.");
-				return false;
-			}
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, majorVersion);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minorVersion);
-			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-			return true;
-			//if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-			//{
-				//Log<Error>("Failed to initialize GLAD.");
-			//	return false;
-			//}
-
-		}
+		extern bool Init(int majorVersion, int minorVersion);
+		extern void Terminate();
+	}
+	namespace GraphicsContext
+	{
+		extern bool Init();
 	}
 }

@@ -4,6 +4,10 @@ namespace Kek
 {
 	WindowsConsole wConsole;
 	IConsole* Debug::console = &wConsole;
+#ifdef DEBUG_MODE
+	FlagSet Debug::Mask = ~0;
+#endif // DEBUG_MODE
+
 
 	// Find next sequence.
 	void GetNextFormatSeqence(const std::string_view& str, int& start, int& end)
@@ -82,7 +86,7 @@ namespace Kek
 		if(str[pos] == '(')
 		{
 			pos++;
-			int end = str.find(')', pos);
+			size_t end = str.find(')', pos);
 			if(end == -1) return colRGB8i(0, 0, 0);
 
 			colRGB8i col;
@@ -109,7 +113,7 @@ namespace Kek
 		if(str[pos] == '{')
 		{
 			pos++;
-			int end = str.find('}', pos);
+			size_t end = str.find('}', pos);
 			if(end == -1) return colRGB8i(0, 0, 0);
 			if(!Debug::console->colorTable.isValidName(std::string(str.begin() + pos, str.begin() + end)))return colRGB8i(0, 0, 0);
 			colRGB8i col = Debug::console->colorTable[std::string(str.begin() + pos, str.begin() + end)];
@@ -221,7 +225,7 @@ namespace Kek
 			{
 			case '[':
 			{
-				int index = str.find(']', i);
+				size_t index = str.find(']', i);
 				if(index != -1) i = index;
 			}
 			continue;
@@ -280,10 +284,13 @@ namespace Kek
 	template <>
 	void Log<LogType::Info>(const std::string_view& str)
 	{
+#ifdef DEBUG_MODE
+		if(Debug::Mask.IsDown(LogType::Info)) return;
+#endif // DEBUG_MODE
+
 		colRGB8i col = Debug::console->GetColor();
 		Debug::console->SetColor("Green");
 		*Debug::console << "Info: ";
-
 
 		Debug::console->SetColor("LYellow");
 		TranslateAndLog(str);
@@ -293,6 +300,10 @@ namespace Kek
 	template <>
 	void Log<LogType::Warning>(const std::string_view& str)
 	{
+#ifdef DEBUG_MODE
+		if(Debug::Mask.IsDown(LogType::Warning)) return;
+#endif // DEBUG_MODE
+
 		colRGB8i col = Debug::console->GetColor();
 		Debug::console->SetColor("Yellow");
 		*Debug::console << "Warning: ";
@@ -305,6 +316,10 @@ namespace Kek
 	template <>
 	void Log<LogType::Error>(const std::string_view& str)
 	{
+#ifdef DEBUG_MODE
+		if(Debug::Mask.IsDown(LogType::Error)) return;
+#endif // DEBUG_MODE
+
 		colRGB8i col = Debug::console->GetColor();
 		Debug::console->SetColor("Red");
 		*Debug::console << "Error: ";
@@ -317,7 +332,11 @@ namespace Kek
 	template <>
 	void Log<LogType::Raw>(const std::string_view& str)
 	{
-		*Debug::console << str << '\n';
+#ifdef DEBUG_MODE
+		if(Debug::Mask.IsDown(LogType::Raw)) return;
+#endif // DEBUG_MODE
+
+		* Debug::console << str << '\n';
 	}
 	template <>
 	void Log<LogType::None>(const std::string_view& str)

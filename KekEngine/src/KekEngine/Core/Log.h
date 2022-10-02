@@ -1,27 +1,33 @@
 #pragma once
 #include <iosfwd>
 #include "Console.h"
+#include "KekEngine/Core/Flag.h"
+
+#define DEBUG_MODE
 
 namespace Kek
 {
+	/// <summary>
+	/// Enum that specifies how to Log the string.
+	/// </summary>
+	enum LogType
+	{
+		None = 0,
+		Raw = 1,
+		Info = 2,
+		Warning = 4,
+		Error = 8
+	};
+
 	namespace Debug
 	{
 		/// <summary>
 		/// Console Interface holding refrence to Console object.
 		/// </summary>
 		extern IConsole* console;
-	};
-
-	/// <summary>
-	/// Enum that specifies how to Log the string.
-	/// </summary>
-	enum LogType
-	{
-		None,
-		Raw,
-		Info,
-		Warning,
-		Error
+#ifdef DEBUG_MODE;
+		extern FlagSet Mask;
+#endif // Debug_Mode;
 	};
 
 	/// <summary>
