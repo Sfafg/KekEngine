@@ -3,8 +3,6 @@
 #include "Console.h"
 #include "KekEngine/Core/Flag.h"
 
-#define DEBUG_MODE
-
 namespace Kek
 {
 	/// <summary>
@@ -24,9 +22,9 @@ namespace Kek
 		/// <summary>
 		/// Console Interface holding refrence to Console object.
 		/// </summary>
-		extern IConsole* console;
-#ifdef DEBUG_MODE;
-		extern FlagSet Mask;
+		IConsole* Console();
+#ifndef NDEBUG;
+		FlagSet& Mask();
 #endif // Debug_Mode;
 	};
 

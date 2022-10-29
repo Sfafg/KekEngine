@@ -10,7 +10,7 @@ namespace Kek
 		bool IsUp(char flags) const;
 		bool IsDown(char flags) const;
 
-		FlagSet(char value = ~0);
+		FlagSet(char value);
 		operator char& ();
 
 		private:

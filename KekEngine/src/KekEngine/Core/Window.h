@@ -4,7 +4,6 @@
 #include "KekEngine/Core/Monitor.h"
 #include "KekEngine/Core/Flag.h"
 
-struct GLFWwindow;
 
 namespace Kek
 {
@@ -20,44 +19,54 @@ namespace Kek
 
 	class Window
 	{
-		GLFWwindow* glfwWindow;
+		void* window;
+		const char* name;
 		public:
+
 		Window(const char* title, FlagSet style, Monitor monitor = Monitor());
-		Window(const char* title, FlagSet style, vec2i size, vec2i pos = { 0,0 }, Monitor monitor = Monitor());
-		Window(const char* title, FlagSet style, vec2f size, vec2f pos = { 0,0 }, Monitor monitor = Monitor());
-		Window(const char* title, vec2i size, vec2i pos = { 0,0 }, Monitor monitor = Monitor());
-		Window(const char* title, vec2f size, vec2f pos = { 0,0 }, Monitor monitor = Monitor());
+		Window(const char* title, FlagSet style, vec2i size, vec2i pos = { -1,-1 }, Monitor monitor = Monitor());
+		Window(const char* title, FlagSet style, vec2f size, vec2f pos = { -1,-1 }, Monitor monitor = Monitor());
+		Window(const char* title, vec2i size, vec2i pos = { -1,-1 }, Monitor monitor = Monitor());
+		Window(const char* title, vec2f size, vec2f pos = { -1,-1 }, Monitor monitor = Monitor());
+
+		Window(const Window& window);
+		void operator=(const Window& window);
+
+		operator void* ();
 
 		Event<vec2i, Window*> OnMouseMove;
 		Event<vec2i, Window*> OnMove;
 		Event<bool, Window*> OnMouseEnter;
+		Event<char, int, char, Window*> OnKey;
 
 		Event<vec2i, Window*> OnResize;
 		Event<Window*> OnClose;
 		Event<bool, Window*> OnMaximize;
 		Event<bool, Window*> OnFocus;
 
-		operator GLFWwindow* ();
+		const char* Title() const;
+		void SetTitle(const char* title);
 
-		vec2i Position();
+		vec2i Position() const;
 		void SetPosition(vec2i pos);
-		vec2i Size();
+		vec2i Size() const;
 		void SetSize(vec2i size);
 
-		vec2f MousePosition();
+		vec2f MousePosition() const;
 		void SetMousePosition(vec2f mpos);
 
-		bool GetKey(int key);
+		bool GetKey(int key) const;
 		bool GetButton(int button);
 
 		void Focus();
 		Monitor GetMonitor();
 		void SetMonitor(Monitor monitor);
 
+		void SwapBuffers();
 		void SetAttribute(int attrib, int value);
 		void ContextCurrent();
 		void Close();
-		bool Closed();
+		bool Closed() const;
 		void Destroy();
 	};
 }

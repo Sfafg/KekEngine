@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <map>
 #include "Console.h"
 #include "KekEngine/Maths/Color.h"
 #include "KekEngine/Maths/Byte.h"
@@ -6,84 +7,109 @@
 namespace Kek
 {
 	ColorTable IConsole::colorTable;
+	colRGB8i& TableColor(int index)
+	{
+		static colRGB8i colorTable[]
+		{
+			colRGB8i(242, 242, 242),
+			colRGB8i(12, 12, 12),
+			colRGB8i(0, 55, 218),
+			colRGB8i(19, 161, 14),
+			colRGB8i(58, 150, 221),
+			colRGB8i(197, 15, 31),
+			colRGB8i(136, 23, 152),
+			colRGB8i(193, 156, 0),
+			colRGB8i(118, 118, 118),
+			colRGB8i(192, 192, 192),
+			colRGB8i(59, 120, 255),
+			colRGB8i(22, 198, 12),
+			colRGB8i(97, 214, 214),
+			colRGB8i(231, 72, 86),
+			colRGB8i(180, 0, 158),
+			colRGB8i(249, 241, 165)
+		};
 
-	colRGB8i colorTable[]
+		return colorTable[index];
+	}
+	std::map<std::string, int>& ColorMap()
 	{
-		colRGB8i(242,242,242),
-		colRGB8i(12,12 ,12),
-		colRGB8i(0,55 ,218),
-		colRGB8i(19,161,14),
-		colRGB8i(58,150,221),
-		colRGB8i(197,15,31),
-		colRGB8i(136,23,152),
-		colRGB8i(193,156,0),
-		colRGB8i(118,118,118),
-		colRGB8i(192,192,192),
-		colRGB8i(59,120,255),
-		colRGB8i(22,198,12),
-		colRGB8i(97,214,214),
-		colRGB8i(231,72 ,86),
-		colRGB8i(180,0,158),
-		colRGB8i(249,241,165)
-	};
-	std::map<std::string, int> colorMap
-	{
-			{"White"   ,0},
-			{"Black"   ,1},
-			{"Blue"    ,2},
-			{"Green"   ,3},
-			{"Cyan"    ,4},
-			{"Red"     ,5},
-			{"Magenta" ,6},
-			{"Yellow"  ,7},
-			{"Gray"    ,8},
-			{"LGray"   ,9},
-			{"LBlue"   ,10},
-			{"LGreen"  ,11},
-			{"LCyan"   ,12},
-			{"LRed"    ,13},
-			{"LMagenta",14},
-			{"LYellow" ,15}
-	};
+		static std::map<std::string, int> colorMap
+		{
+				{"White"   ,0},
+				{"Black"   ,1},
+				{"Blue"    ,2},
+				{"Green"   ,3},
+				{"Cyan"    ,4},
+				{"Red"     ,5},
+				{"Magenta" ,6},
+				{"Yellow"  ,7},
+				{"Gray"    ,8},
+				{"LGray"   ,9},
+				{"LBlue"   ,10},
+				{"LGreen"  ,11},
+				{"LCyan"   ,12},
+				{"LRed"    ,13},
+				{"LMagenta",14},
+				{"LYellow" ,15}
+		};
+
+		return colorMap;
+	}
+
 	bool ColorTable::isValidName(const std::string& str)
 	{
-		return colorMap.contains(str);
+		return ColorMap().contains(str);
 	}
 	colRGB8i ColorTable::operator[](const std::string& str)
 	{
-		if(!ColorTable::isValidName(str)){ return colRGB(255, 255, 255); }
-		return colorTable[colorMap[str]];
+		auto search = ColorMap().find(str);
+		if(search == ColorMap().end()){ return colRGB8i(255, 255, 255); }
+		return TableColor(search->second);
 	}
 	colRGB8i ColorTable::operator[](int ind)
 	{
-
-		return colorTable[ind];
+		return TableColor(ind);
 	}
 
 	void IConsole::SetColor(const std::string& colorName) { SetColor(colorTable[colorName]); }
 	void IConsole::SetBackColor(const std::string& colorName) { SetBackColor(colorTable[colorName]); }
 
 #pragma region WindowsConsole
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	Byte windowsColorTable[]
+	HANDLE& HConsole()
 	{
-		Byte(0b00001111),
-		Byte(0b00000000),
-		Byte(0b00000001),
-		Byte(0b00000010),
-		Byte(0b00000011),
-		Byte(0b00000100),
-		Byte(0b00000101),
-		Byte(0b00000110),
-		Byte(0b00001000),
-		Byte(0b00000111),
-		Byte(0b00001001),
-		Byte(0b00001010),
-		Byte(0b00001011),
-		Byte(0b00001100),
-		Byte(0b00001101),
-		Byte(0b00001110),
-	};
+		static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+		DWORD dwMode = 0;
+		GetConsoleMode(hConsole, &dwMode);
+		dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+		SetConsoleMode(hConsole, dwMode);
+
+		return hConsole;
+	}
+	Byte& WindowsColorTable(int index)
+	{
+		static Byte windowsColorTable[]
+		{
+			Byte(0b00001111),
+			Byte(0b00000000),
+			Byte(0b00000001),
+			Byte(0b00000010),
+			Byte(0b00000011),
+			Byte(0b00000100),
+			Byte(0b00000101),
+			Byte(0b00000110),
+			Byte(0b00001000),
+			Byte(0b00000111),
+			Byte(0b00001001),
+			Byte(0b00001010),
+			Byte(0b00001011),
+			Byte(0b00001100),
+			Byte(0b00001101),
+			Byte(0b00001110),
+		};
+
+		return windowsColorTable[index];
+	}
 	void SetWindowsConsoleColor(const colRGB8i& font, const colRGB8i& background)
 	{
 		int fontIndex = 0;
@@ -106,9 +132,9 @@ namespace Kek
 				backIndex = i;
 			}
 		}
-		Byte fontColorByte = windowsColorTable[fontIndex];
-		Byte backColorByte = windowsColorTable[backIndex] << 4;
-		SetConsoleTextAttribute(hConsole, backColorByte | fontColorByte);
+		Byte fontColorByte = WindowsColorTable(fontIndex);
+		Byte backColorByte = WindowsColorTable(backIndex) << 4;
+		SetConsoleTextAttribute(HConsole(), backColorByte | fontColorByte);
 	}
 
 	void WindowsConsole::SetIndention(int indention)

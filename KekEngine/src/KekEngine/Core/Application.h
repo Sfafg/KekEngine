@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "Events.h"
 
 namespace Kek
 {
@@ -7,17 +8,25 @@ namespace Kek
 	void Update();
 	class Application
 	{
-		static void Realloc(int size);
 		public:
+		static Event<>& FrameEndEvent();
 
+		Application(const Window& window);
 		Application();
-		static void Quit();
 
+		const Window& operator[](unsigned int index) const;
+		Window& operator[](unsigned int index);
+
+		static void Close();
 		static bool Closed();
 
 		static int WindowCount();
 		static void AddWindow(const Window& window);
+		static void AddWindow(Window* _window);
 		static Window& GetWindow(int index);
 		static void DeleteWindow(int index);
+
+		private:
+		static void Realloc(int size);
 	};
 }

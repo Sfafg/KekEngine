@@ -2,13 +2,13 @@
 
 namespace Kek
 {
-	namespace WindowContext
+	namespace SystemContext
 	{
-		extern bool Init(int majorVersion, int minorVersion);
+		extern bool Init();
 		extern void Terminate();
 	}
 	namespace GraphicsContext
 	{
-		extern bool Init();
+		extern bool Init(int majorVersion, int minorVersion);
 	}
 }

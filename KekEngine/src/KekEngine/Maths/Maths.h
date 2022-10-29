@@ -1,4 +1,5 @@
 #pragma once
+#include <type_traits>
 namespace Kek
 {
 	namespace Maths
@@ -17,7 +18,17 @@ namespace Kek
 		template <typename T> T Clamp(T x, T min, T max) { return Max(Min(x, max), min); }
 		template <typename T> T Lerp(T a, T b, float k) { return a * (1.0f - k) + b * k; }
 		template <typename T> T Wrap(T x, T Min, T Max) { float mod = fmod(x - Min, Max - Min); if(mod < 0) return Max + mod; return mod + Min; }
-		template <typename T> T Random(T min, T max) { return (T)Rand() / MAX_RAND * (max - min) + min; }
+		template <typename T> T Random(T min, T max)
+		{
+			if constexpr(std::is_floating_point<T>::value)
+			{
+				return (T)Rand() / MAX_RAND * (max - min) + min;
+			}
+			else
+			{
+				return Rand()%(max - min) + min;
+			}
+		}
 
 		float Sin(float a);
 		float ArcSin(float a);

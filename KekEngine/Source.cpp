@@ -1,18 +1,29 @@
-#include "KekEngine/Core/Application.h"
 #include "KekEngine/Core/Log.h"
-#include "KekEngine/Core/Window.h"
-#include "GLFW/glfw3.h"
-
+#include "KekEngine/Core/Application.h"
+#include "KekEngine/SystemIO/SystemIO.h"
+#include <thread>
+#include <chrono>
+using namespace std::chrono_literals;
+/// KURDE JAK MIE PROGRAM ZWALNIA TO ZAS MI KLAWIATURA NIE DZIAA DOBRZE.
+/// ADD MODULATORS TO SYSTEM_IO TO MATCH GLFW, AND ALSO PUT THEM BACK TO GLFW.
 using namespace Kek;
 
+void LogMouse(vec2i mpos)
+{
+	Log<Info>(mpos);
+}
 Application app;
 void Kek::Setup()
 {
-	app.AddWindow(Window("KekEngine", WindowStyle::None, vec2f(0.5, 0.5), vec2f(0.25, 0.25)));
+	SystemIO::Init();
+	SystemIO::MouseMoveEvent() += LogMouse;
+	app.AddWindow(Window{"window", vec2i(800,600)});
 }
 void Kek::Update()
 {
-	if(app.GetWindow(0).GetKey(GLFW_KEY_ESCAPE))app.Quit();
-
-	glfwSwapBuffers(app.GetWindow(0));
+	if(app.WindowCount() == 0) app.Close();
+	for(int i = 0; i < app.WindowCount(); i++)
+	{
+		app[i].SwapBuffers();
+	}
 }

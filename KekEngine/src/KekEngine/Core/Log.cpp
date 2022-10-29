@@ -2,12 +2,21 @@
 
 namespace Kek
 {
-	WindowsConsole wConsole;
-	IConsole* Debug::console = &wConsole;
-#ifdef DEBUG_MODE
-	FlagSet Debug::Mask = ~0;
-#endif // DEBUG_MODE
+	IConsole* Debug::Console()
+	{
+		static WindowsConsole wConsole;
+		static IConsole* console = &wConsole;
 
+		return console;
+	}
+#ifndef NDEBUG
+	FlagSet& Debug::Mask()
+	{
+		static FlagSet mask(~0);
+
+		return mask;
+	}
+#endif // DEBUG_MODE
 
 	// Find next sequence.
 	void GetNextFormatSeqence(const std::string_view& str, int& start, int& end)
@@ -49,19 +58,19 @@ namespace Kek
 		FormatData() { Get(); }
 		void Get()
 		{
-			fontCol = Debug::console->GetColor();
-			backCol = Debug::console->GetBackColor();
-			isBold = Debug::console->GetBold();
-			isUnderline = Debug::console->GetUnderline();
-			indentionLevel = Debug::console->GetIndention();
+			fontCol = Debug::Console()->GetColor();
+			backCol = Debug::Console()->GetBackColor();
+			isBold = Debug::Console()->GetBold();
+			isUnderline = Debug::Console()->GetUnderline();
+			indentionLevel = Debug::Console()->GetIndention();
 		}
 		void Set()
 		{
-			Debug::console->SetColor(fontCol);
-			Debug::console->SetBackColor(backCol);
-			Debug::console->SetBold(isBold);
-			Debug::console->SetUnderline(isUnderline);
-			Debug::console->SetIndention(indentionLevel);
+			Debug::Console()->SetColor(fontCol);
+			Debug::Console()->SetBackColor(backCol);
+			Debug::Console()->SetBold(isBold);
+			Debug::Console()->SetUnderline(isUnderline);
+			Debug::Console()->SetIndention(indentionLevel);
 		}
 	};
 
@@ -115,8 +124,8 @@ namespace Kek
 			pos++;
 			size_t end = str.find('}', pos);
 			if(end == -1) return colRGB8i(0, 0, 0);
-			if(!Debug::console->colorTable.isValidName(std::string(str.begin() + pos, str.begin() + end)))return colRGB8i(0, 0, 0);
-			colRGB8i col = Debug::console->colorTable[std::string(str.begin() + pos, str.begin() + end)];
+			if(!Debug::Console()->colorTable.isValidName(std::string(str.begin() + pos, str.begin() + end)))return colRGB8i(0, 0, 0);
+			colRGB8i col = Debug::Console()->colorTable[std::string(str.begin() + pos, str.begin() + end)];
 			pos = end;
 			return col;
 		}
@@ -126,7 +135,7 @@ namespace Kek
 	{
 		if(str.size() == 0)
 		{
-			Debug::console->SetDefault();
+			Debug::Console()->SetDefault();
 			return FormatData();
 		}
 
@@ -142,6 +151,8 @@ namespace Kek
 				int a;
 				ss >> a;
 				formatData.indentionLevel = a;
+				i--;
+				continue;
 			}
 
 			switch(str[i])
@@ -207,6 +218,12 @@ namespace Kek
 	}
 	void GetScope(const std::string_view& str, int& start, int& end)
 	{
+		if(start >= str.size())
+		{
+			start = -1;
+			return;
+		}
+
 		// Check if first character after all spaces is '<'.
 		while(str[start] == ' ') start++;
 		if(str[start] != '<')
@@ -257,7 +274,7 @@ namespace Kek
 
 		int start = 0, end = 0;
 		GetNextFormatSeqence(str, start, end);
-		*Debug::console << std::string_view(str.begin(), str.begin() + start);
+		*Debug::Console() << std::string_view(str.begin(), str.begin() + start);
 
 		if(end == -1) return;
 
@@ -284,64 +301,64 @@ namespace Kek
 	template <>
 	void Log<LogType::Info>(const std::string_view& str)
 	{
-#ifdef DEBUG_MODE
-		if(Debug::Mask.IsDown(LogType::Info)) return;
+#ifndef NDEBUG
+		if(Debug::Mask().IsDown(LogType::Info)) return;
 #endif // DEBUG_MODE
 
-		colRGB8i col = Debug::console->GetColor();
-		Debug::console->SetColor("Green");
-		*Debug::console << "Info: ";
+		colRGB8i col = Debug::Console()->GetColor();
+		Debug::Console()->SetColor("Green");
+		*Debug::Console() << "Info: ";
 
-		Debug::console->SetColor("LYellow");
+		Debug::Console()->SetColor("LYellow");
 		TranslateAndLog(str);
-		Debug::console->SetColor(col);
-		*Debug::console << '\n';
+		Debug::Console()->SetColor(col);
+		*Debug::Console() << '\n';
 	}
 	template <>
 	void Log<LogType::Warning>(const std::string_view& str)
 	{
-#ifdef DEBUG_MODE
-		if(Debug::Mask.IsDown(LogType::Warning)) return;
+#ifndef NDEBUG
+		if(Debug::Mask().IsDown(LogType::Warning)) return;
 #endif // DEBUG_MODE
 
-		colRGB8i col = Debug::console->GetColor();
-		Debug::console->SetColor("Yellow");
-		*Debug::console << "Warning: ";
+		colRGB8i col = Debug::Console()->GetColor();
+		Debug::Console()->SetColor("Yellow");
+		*Debug::Console() << "Warning: ";
 
-		Debug::console->SetColor("LYellow");
+		Debug::Console()->SetColor("LYellow");
 		TranslateAndLog(str);
-		Debug::console->SetColor(col);
-		*Debug::console << '\n';
+		Debug::Console()->SetColor(col);
+		*Debug::Console() << '\n';
 	}
 	template <>
 	void Log<LogType::Error>(const std::string_view& str)
 	{
-#ifdef DEBUG_MODE
-		if(Debug::Mask.IsDown(LogType::Error)) return;
+#ifndef NDEBUG
+		if(Debug::Mask().IsDown(LogType::Error)) return;
 #endif // DEBUG_MODE
 
-		colRGB8i col = Debug::console->GetColor();
-		Debug::console->SetColor("Red");
-		*Debug::console << "Error: ";
+		colRGB8i col = Debug::Console()->GetColor();
+		Debug::Console()->SetColor("Red");
+		*Debug::Console() << "Error: ";
 
-		Debug::console->SetColor("LYellow");
+		Debug::Console()->SetColor("LYellow");
 		TranslateAndLog(str);
-		Debug::console->SetColor(col);
-		*Debug::console << '\n';
+		Debug::Console()->SetColor(col);
+		*Debug::Console() << '\n';
 	}
 	template <>
 	void Log<LogType::Raw>(const std::string_view& str)
 	{
-#ifdef DEBUG_MODE
-		if(Debug::Mask.IsDown(LogType::Raw)) return;
+#ifndef NDEBUG
+		if(Debug::Mask().IsDown(LogType::Raw)) return;
 #endif // DEBUG_MODE
 
-		* Debug::console << str << '\n';
+		*Debug::Console() << str;
 	}
 	template <>
 	void Log<LogType::None>(const std::string_view& str)
 	{
 		TranslateAndLog(str);
-		*Debug::console << '\n';
+		*Debug::Console() << '\n';
 	}
 }

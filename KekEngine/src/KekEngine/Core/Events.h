@@ -1,5 +1,5 @@
 #pragma once
-
+#include <stdlib.h> 
 namespace Kek
 {
 	template <typename TReturn = void, typename... TInputs>
@@ -7,7 +7,7 @@ namespace Kek
 	{
 		typedef TReturn(*Pointer)(TInputs...);
 
-		FunctionPointer() :ptr(NULL) {}
+		FunctionPointer() : ptr(NULL) {}
 		FunctionPointer(TReturn(*ptr)(TInputs...)) : ptr(ptr)
 		{
 		}
@@ -38,14 +38,15 @@ namespace Kek
 		}
 
 		public:
-		Event() :pointers(NULL), size(0) {}
-		~Event() { delete pointers; }
-		Event(const Event<TInputs... >& o)
+		Event() : pointers(NULL), size(0) {}
+		~Event() { free(pointers); }
+		Event(const Event<TInputs...>& o)
 		{
-			if(o.size(0))
+			if(o.Size() || o.pointers == NULL)
 			{
 				size = 0;
-				delete pointers;
+				free(pointers);
+				pointers = NULL;
 				return;
 			}
 			Realocate(o.Size());

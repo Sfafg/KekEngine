@@ -1,20 +1,18 @@
 #pragma once
-#include <map>
 #include <string_view>
 #include <fstream>
-#include "Console.h"
 #include "KekEngine/Maths/Color.h"
 
 namespace Kek
 {
-
 	class ColorTable
 	{
 		public:
-		bool isValidName(const std::string& str);
+		static bool isValidName(const std::string& str);
 		colRGB8i operator[](const std::string& str);
 		colRGB8i operator[](int ind);
 	};
+
 	class IConsole
 	{
 		public:
