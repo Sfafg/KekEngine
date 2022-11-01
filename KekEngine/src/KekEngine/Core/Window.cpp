@@ -122,7 +122,7 @@ namespace Kek
 			[](GLFWwindow* window, int key, int scancode, int action, int mods)
 			{
 				Window* win = (Window*)glfwGetWindowUserPointer(window);
-				win->OnKey(GLFWToKey(key), scancode, GLFWToState(action), win);
+				win->OnKey(GLFWToKey(key), scancode, GLFWToState(action), mods, win);
 			}
 		);
 		glfwSetMouseButtonCallback(
@@ -130,7 +130,7 @@ namespace Kek
 			[](GLFWwindow* window, int button, int action, int mods)
 			{
 				Window* win = (Window*)glfwGetWindowUserPointer(window);
-				win->OnKey(GLFWToKey(button), GLFWToKey(button), GLFWToState(action), win);
+				win->OnKey(GLFWToKey(button), GLFWToKey(button), GLFWToState(action), mods, win);
 			}
 		);
 	}

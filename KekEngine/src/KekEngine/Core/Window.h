@@ -37,7 +37,7 @@ namespace Kek
 		Event<vec2i, Window*> OnMouseMove;
 		Event<vec2i, Window*> OnMove;
 		Event<bool, Window*> OnMouseEnter;
-		Event<char, int, char, Window*> OnKey;
+		Event<char, int, char, FlagSet, Window*> OnKey;
 
 		Event<vec2i, Window*> OnResize;
 		Event<Window*> OnClose;

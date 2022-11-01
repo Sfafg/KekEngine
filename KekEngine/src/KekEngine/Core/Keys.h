@@ -5,13 +5,15 @@ namespace Kek
 {
 	struct KeyData
 	{
-		char index;
-		char state;
+		int index;
+		int state;
 		bool operator ==(const KeyData& o);
 	};
 
 	extern const char* StateName(int state);
 	extern const char* KeyName(int key);
+	extern const char* ModName(int mod);
+	extern const char* EventName(int event);
 
 #pragma region STATES
 	const int State_None = -1;
@@ -22,7 +24,7 @@ namespace Kek
 	const int State_Last = State_Click;
 #pragma endregion
 #pragma region KEYS
-	const int Key_None = -1;
+	const int Key_None = State_None;
 	const int Mouse_1 = 0;
 	const int Mouse_2 = 1;
 	const int Mouse_3 = 2;
@@ -154,5 +156,25 @@ namespace Kek
 	const int Key_F24 = 124;
 	const int Key_Delete = 125;
 	const int Key_Last = Key_Delete;
+#pragma endregion
+#pragma region MODULATORS
+	const int Mod_Shift = 1;
+	const int Mod_Control = 2;
+	const int Mod_Alt = 4;
+	const int Mod_Super = 8;
+	const int Mod_Caps = 16;
+	const int Mod_Num = 32;
+#pragma endregion
+#pragma region Events
+	const int Event_Unknown = State_None;
+	const int Event_Mouse_Move_Left = 126;
+	const int Event_Mouse_Move_Right = 127;
+	const int Event_Mouse_Move_Up = 128;
+	const int Event_Mouse_Move_Down = 129;
+	const int Event_Mouse_Scroll_Left = 130;
+	const int Event_Mouse_Scroll_Right = 131;
+	const int Event_Mouse_Scroll_Up = 132;
+	const int Event_Mouse_Scroll_Down = 133;
+	const int Event_Last = Event_Mouse_Scroll_Down;
 #pragma endregion
 }

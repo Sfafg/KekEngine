@@ -1,194 +1,263 @@
 #include "SystemIO.h"
 #include <map>
+#include <vector>
+#include <mutex>
 #include "KekEngine/Core/Log.h"
 #include "KekEngine/Core/Application.h"
 #include "PlatformIO.h"
 
-Kek::vec2i scrollDelta;
-Kek::vec2i mousePos;
-Kek::vec2i lastMousePos;
-char keyState[128] = { 0 };
+#define DEBUGISINIT(initialized); if(!initialized)Log<Error>("SystemIO is UnInitialized.")
 
-void ScrollCallback(Kek::vec2i delta)
-{
-	scrollDelta = delta;
-}
-void MouseMoveCallback(Kek::vec2i pos)
-{
-	mousePos = pos;
-}
-void KeyCallback(char key, char state, int code)
-{
-	if(state == Kek::State_Press && keyState[key] == Kek::State_Release)
-	{
-		keyState[key] = Kek::State_Click;
-	}
-	else
-	{
-		keyState[key] = state;
-	}
-}
-
-static void FrameEnd()
-{
-	lastMousePos = mousePos;
-	scrollDelta = Kek::vec2i(0, 0);
-	for(int i = 0; i < 128; i++)
-	{
-		if(keyState[i] == Kek::State_Click) keyState[i] = Kek::State_Press;
-	}
-}
 namespace Kek
 {
+	std::map<int, int> keyMap;
+	int keyStateAsync[Key_Last + 1];
+	int keyState[Key_Last + 1];
+
+	void SetModulators(int key, int state, FlagSet& mods)
+	{
+		switch(key)
+		{
+		case Key_Left_Shift: case Key_Right_Shift:
+			(state == State_Press) ? mods.SetUp(Mod_Shift) : mods.SetDown(Mod_Shift); break;
+		case Key_Left_Control: case Key_Right_Control:
+			(state == State_Press) ? mods.SetUp(Mod_Control) : mods.SetDown(Mod_Control); break;
+		case Key_Left_Alt: case Key_Right_Alt:
+			(state == Mod_Alt) ? mods.SetUp(Mod_Alt) : mods.SetDown(Mod_Alt); break;
+		case Key_Left_Super: case Key_Right_Super:
+			(state == State_Press) ? mods.SetUp(Mod_Super) : mods.SetDown(Mod_Super); break;
+		case Key_Caps_Lock:
+			if(state == State_Press) mods ^= Mod_Caps; break;
+		case Key_Num_Lock:
+			if(state == State_Press) mods ^= Mod_Num; break;
+		default: break;
+		}
+	}
+
+	enum class EventType :char
+	{
+		None = 0,
+		Key,
+		Scroll,
+		Mouse
+	};
+	struct KeyEventData
+	{
+		int key;
+		int state;
+		int code;
+	};
+	struct ScrollEventData
+	{
+		vec2i delta;
+	};
+	struct MouseEventData
+	{
+		vec2i pos;
+	};
+
+	struct EventData
+	{
+		EventType type = EventType::None;
+		union
+		{
+			KeyEventData key;
+			ScrollEventData scroll;
+			MouseEventData mouse;
+		};
+
+		EventData(EventType type, KeyEventData data) : type(type)
+		{
+			key = data;
+		}
+		EventData(EventType type, ScrollEventData data) : type(type)
+		{
+			scroll = data;
+		}
+		EventData(EventType type, MouseEventData data) : type(type)
+		{
+			mouse = data;
+		}
+	};
+
+	std::vector<EventData> eventBuffer;
+	std::mutex eventBufferMutex;
+
 	namespace SystemIO
 	{
+		Event<int, int, int, FlagSet> keyEventAsync;
+		Event<vec2i, FlagSet> scrollWheelEventAsync;
+		Event<vec2i, FlagSet> mouseMoveEventAsync;
+		FlagSet modulatorsAsync = 0;
+
+		Event<int, int, int, FlagSet> keyEvent;
+		Event<vec2i, FlagSet> scrollWheelEvent;
+		Event<vec2i, FlagSet> mouseMoveEvent;
+		FlagSet modulators = 0;
+		vec2i scrollDelta;
+		vec2i mousePos;
+		vec2i lastMousePos;
+		vec2i mouseDelta;
+	}
+
+	namespace SystemIO
+	{
+		bool KeyCallback(int key, int state, int code)
+		{
+			// Key mapping.
+			auto search = keyMap.find(key);
+			if(search != keyMap.end())
+			{
+				SetKey({ search->second,state });
+				return false;
+			}
+
+			// Async events.
+			SetModulators(key, state, modulatorsAsync);
+			if(state == State_Press)
+			{
+				keyStateAsync[key] = (keyStateAsync[key] == State_Release) ? State_Click : State_Press;
+			}
+			else keyStateAsync[key] = State_Release;
+			keyEventAsync(key, keyStateAsync[key], code, modulatorsAsync);
+
+			// Event Buffering.
+			eventBufferMutex.lock();
+			eventBuffer.push_back({EventType::Key, KeyEventData(key,state,code)});
+			eventBufferMutex.unlock();
+			return true;
+		}
+		bool ScrollCallback(vec2i delta)
+		{
+			scrollWheelEventAsync(delta, modulatorsAsync);
+
+			// Event Buffering.
+			eventBufferMutex.lock();
+			eventBuffer.push_back(EventData{ EventType::Scroll,ScrollEventData(delta)});
+			eventBufferMutex.unlock();
+			return true;
+		}
+		bool MouseMoveCallback(vec2i pos)
+		{
+			mouseMoveEventAsync(pos, modulatorsAsync);
+
+			// Event Buffering.
+			eventBufferMutex.lock();
+			eventBuffer.push_back(EventData{ EventType::Mouse,MouseEventData(pos) });
+			eventBufferMutex.unlock();
+			return true;
+		}
+
+		void PollEvents()
+		{
+			std::vector<EventData> events;
+			eventBufferMutex.lock();
+			std::swap(events, eventBuffer);
+			eventBufferMutex.unlock();
+
+			for(int i = 0; i < Key_Last + 1; i++)
+			{
+				if(keyState[i] == State_Click) keyState[i] = State_Press;
+			}
+			scrollDelta = vec2i(0, 0);
+			lastMousePos = mousePos;
+
+			for(EventData e : events)
+			{
+				switch(e.type)
+				{
+				case EventType::Key:
+				{
+					if(e.key.state == State_Press)
+					{
+						keyState[e.key.key] = (keyState[e.key.key] == State_Release) ? State_Click : State_Press;
+					}
+					else keyState[e.key.key] = State_Release;
+					SetModulators(e.key.key, e.key.state, modulators);
+					keyEvent(e.key.key, keyState[e.key.key], e.key.code, modulators);
+					break;
+				}
+				case EventType::Scroll:
+				{
+					scrollDelta = e.scroll.delta;
+					scrollWheelEvent(e.scroll.delta, modulators);
+					break;
+				}
+				case EventType::Mouse:
+				{
+					mousePos = e.mouse.pos;
+					mouseDelta = lastMousePos - mousePos;
+					mouseMoveEvent(e.mouse.pos, modulators);
+					break;
+				}
+				default:break;
+				}
+			}
+		}
+
 		bool initialized = false;
 		void Init()
 		{
 #ifndef NDEBUG
-			if(initialized)
-			{
-				Log<Error>("You must NOT initialize SystemIO more then once.");
-				return;
-			}
-			initialized = true;
-#endif // !NDEBUG
+			if(initialized){ Log<Error>("You must NOT initialize SystemIO twice."); return; }
+#endif
 			PlatformIO::Init();
 
-			MouseScrollEvent() += ScrollCallback;
-			MouseMoveEvent() += MouseMoveCallback;
-			KeyEvent() += KeyCallback;
+			PlatformIO::keyCallback = KeyCallback;
+			PlatformIO::scrollWheelCallback = ScrollCallback;
+			PlatformIO::mouseMoveCallback = MouseMoveCallback;
 
-			Application::FrameEndEvent() += FrameEnd;
-		}
-
-		Event<vec2i>& MouseMoveEvent()
-		{
-#ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-			}
-#endif // !NDEBUG
-			return PlatformIO::MouseMoveEvent();
-		}
-		Event<vec2i>& MouseScrollEvent()
-		{
-#ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-			}
-#endif // !NDEBUG
-			return PlatformIO::MouseScrollEvent();
-		}
-		Event<char, char, int>& KeyEvent()
-		{
-#ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-			}
-#endif // !NDEBUG
-			return PlatformIO::KeyEvent();
+			initialized = true;
 		}
 
-		vec2i MousePos()
+		int Key(int index)
 		{
 #ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-			}
-#endif // !NDEBUG
-			return mousePos;
-		}
-		vec2i MouseDelta()
-		{
-#ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-			}
-#endif // !NDEBUG
-			return mousePos - lastMousePos;
-		}
-		vec2i ScrollDelta()
-		{
-#ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-			}
-#endif // !NDEBUG
-			return scrollDelta;
-		}
-		char Key(char index)
-		{
-#ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-			}
-#endif // !NDEBUG
+			DEBUGISINIT(initialized);
+#endif
 			return keyState[index];
 		}
 
 		void SetMousePos(vec2i pos)
 		{
 #ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-				return;
-			}
-#endif // !NDEBUG
+			DEBUGISINIT(initialized);
+#endif
 			PlatformIO::SetMousePos(pos);
 		}
 		void SetMouseDelta(vec2i delta)
 		{
 #ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-				return;
-			}
-#endif // !NDEBUG
+			DEBUGISINIT(initialized);
+#endif
 			PlatformIO::SetMouseDelta(delta);
 		}
 		void SetScrollDelta(vec2i scrollDelta)
 		{
 #ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-				return;
-			}
-#endif // !NDEBUG
+			DEBUGISINIT(initialized);
+#endif
 			PlatformIO::SetScrollDelta(scrollDelta);
 		}
 		void SetKey(KeyData key)
 		{
 #ifndef NDEBUG
-			if(!initialized)
-			{
-				Log<Error>("SystemIO is uninitialized.");
-				return;
-			}
-#endif // !NDEBUG
+			DEBUGISINIT(initialized);
+#endif
 			if(key.index == Key_None) return;
 			PlatformIO::SetKey(key);
 		}
 		void MapKey(int keyA, int keyB)
 		{
 #ifndef NDEBUG
-			if(!initialized)
+			DEBUGISINIT(initialized);
+#endif
+			if(keyA == keyB)
 			{
-				Log<Error>("SystemIO is uninitialized.");
+				keyMap.erase(keyA);
 				return;
 			}
-#endif // !NDEBUG
-			PlatformIO::MapKey(keyA, keyB);
+			keyMap[keyA] = keyB;
 		}
 	}
 }

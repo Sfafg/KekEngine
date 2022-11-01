@@ -31,4 +31,10 @@ namespace Kek
 		std::chrono::duration<float> dur = std::chrono::high_resolution_clock::now() - start;
 		return dur.count() * TFormat;
 	}
+
+
+	template class Clock<Nanoseconds>;
+	template class Clock<Microseconds>;
+	template class Clock<Miliseconds>;
+	template class Clock<Seconds>;
 }

@@ -1,22 +1,35 @@
 #include "KekEngine/Core/Log.h"
+#include "KekEngine/Maths/Byte.h"
 #include "KekEngine/Core/Application.h"
 #include "KekEngine/SystemIO/SystemIO.h"
-/// KURDE JAK MIE PROGRAM ZWALNIA TO ZAS MI KLAWIATURA NIE DZIAA DOBRZE.
-/// ADD MODULATORS TO SYSTEM_IO TO MATCH GLFW, AND ALSO PUT THEM BACK TO GLFW.
+/// LOOP WHEN MAPPING A TO B AND B TO A.
+/// ADD MAPPING TO EVENTS LIKE SCROLL.
+
 using namespace Kek;
 
+void Logger(int key, int state, int code, FlagSet modulators)
+{
+	if(key <= Mouse_Last)
+	{
+		Log<Warning>(SystemIO::mousePos, " ", SystemIO::mouseDelta);
+	}
+	else Log<Warning>(KeyName(key), " ", StateName(state), " ");
+}
+
+void Loggerwh(vec2i delta, FlagSet modulators)
+{
+	Log<Warning>(delta);
+}
 Application app;
 void Kek::Setup()
 {
 	SystemIO::Init();
+
+	SystemIO::keyEvent += Logger;
+	SystemIO::scrollWheelEvent += Loggerwh;
 }
 void Kek::Update()
 {
-	if(SystemIO::Key(Key_Enter) != State_Click) return;
-
-	for(int i = 0; i < 5000; i++)
-	{
-		SystemIO::SetKey({ Mouse_Left, State_Click });
-	}
-	app.Close();
+	if(SystemIO::Key(Key_Escape) == State_Click) app.Close();
+	SystemIO::PollEvents();
 }

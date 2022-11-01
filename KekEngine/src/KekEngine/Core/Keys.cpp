@@ -144,7 +144,28 @@ namespace Kek
 		{Key_Right_Super,"Right_Super"},
 		{Key_Menu,"Menu"},
 	};
-
+	const std::map<int, const char*> modNameMap
+	{
+		{Mod_Shift,"Shift"},
+		{Mod_Control,"Control"},
+		{Mod_Alt,"Alt"},
+		{Mod_Super,"Super"},
+		{Mod_Caps,"CapsLock"},
+		{Mod_Num,"NumLock"}
+	};
+	const std::map<int, const char*> eventNameMap
+	{
+		{Event_Mouse_Move_Left,"Mouse_Move_Left"},
+		{Event_Mouse_Move_Right,"Mouse_Move_Right"},
+		{Event_Mouse_Move_Up,"Mouse_Move_Up"},
+		{Event_Mouse_Move_Down,"Mouse_Move_Down"},
+		{Event_Mouse_Scroll_Left,"Mouse_Scroll_Left"},
+		{Event_Mouse_Scroll_Right,"Mouse_Scroll_Right"},
+		{Event_Mouse_Scroll_Up,"Mouse_Scroll_Up"},
+		{Event_Mouse_Scroll_Down,"Mouse_Scroll_Down"}
+	};
 	const char* StateName(int state) { return stateNameMap.at(state); }
 	const char* KeyName(int key) { return keyNameMap.at(key); }
+	const char* ModName(int mod) { return modNameMap.at(mod); }
+	const char* EventName(int event) { return eventNameMap.at(event); }
 }
