@@ -25,7 +25,6 @@ void Kek::Setup()
 {
 	SystemIO::Init();
 
-	//SystemIO::MapKey(Event_Scroll_Up, Key_Space);
 	SystemIO::keyEvent += Logger;
 	SystemIO::scrollWheelEvent += Loggerwh;
 }

@@ -104,8 +104,6 @@ namespace Kek
 	{
 		bool KeyCallback(int key, int state, int code, bool simulated)
 		{
-			if(simulated) Log<Info>("SIMULATED");
-
 			// Key mapping.
 			auto search = keyMap.find(key);
 			if(search != keyMap.end())
@@ -138,7 +136,7 @@ namespace Kek
 				auto search = keyMap.find(Event_Scroll_Right);
 				if(search != keyMap.end())
 				{
-					SetKey({ search->second,1 });
+					SetKey({ search->second,State_Click });
 					return false;
 				}
 			}
@@ -147,16 +145,17 @@ namespace Kek
 				auto search = keyMap.find(Event_Scroll_Left);
 				if(search != keyMap.end())
 				{
-					SetKey({ search->second,1 });
+					SetKey({ search->second,State_Click });
 					return false;
 				}
 			}
+
 			if(delta.y > 0)
 			{
 				auto search = keyMap.find(Event_Scroll_Up);
 				if(search != keyMap.end())
 				{
-					SetKey({ search->second,1 });
+					SetKey({ search->second,State_Click });
 					return false;
 				}
 			}
@@ -165,7 +164,7 @@ namespace Kek
 				auto search = keyMap.find(Event_Scroll_Down);
 				if(search != keyMap.end())
 				{
-					SetKey({ search->second,1 });
+					SetKey({ search->second,State_Click });
 					return false;
 				}
 			}
@@ -189,7 +188,7 @@ namespace Kek
 				auto search = keyMap.find(Event_Mouse_Move_Right);
 				if(search != keyMap.end())
 				{
-					SetKey({ search->second,1 });
+					SetKey({ search->second,State_Click });
 					delta.x = 0;
 					SetMousePos(mousePosAsync + delta);
 					return false;
@@ -307,15 +306,15 @@ namespace Kek
 			{
 				switch(key.index)
 				{
-				case Event_Mouse_Move_Left: SetMouseDelta(vec2i(-key.state, 0)); break;
-				case Event_Mouse_Move_Right: SetMouseDelta(vec2i(key.state, 0)); break;
-				case Event_Mouse_Move_Up: SetMouseDelta(vec2i(0, key.state)); break;
-				case Event_Mouse_Move_Down: SetMouseDelta(vec2i(0, -key.state)); break;
+				case Event_Mouse_Move_Left: SetMouseDelta(vec2i(-1, 0)); break;
+				case Event_Mouse_Move_Right: SetMouseDelta(vec2i(1, 0)); break;
+				case Event_Mouse_Move_Up: SetMouseDelta(vec2i(0, 1)); break;
+				case Event_Mouse_Move_Down: SetMouseDelta(vec2i(0, -1)); break;
 
-				case Event_Scroll_Left: SetScrollDelta(vec2i(-120 * key.state, 0)); break;
-				case Event_Scroll_Right: SetScrollDelta(vec2i(120 * key.state, 0)); break;
-				case Event_Scroll_Up: SetScrollDelta(vec2i(0, 120 * key.state)); break;
-				case Event_Scroll_Down: SetScrollDelta(vec2i(0, -120 * key.state)); break;
+				case Event_Scroll_Left: SetScrollDelta(vec2i(-120 , 0)); break;
+				case Event_Scroll_Right: SetScrollDelta(vec2i(120  , 0)); break;
+				case Event_Scroll_Up: SetScrollDelta(vec2i(0, 120  )); break;
+				case Event_Scroll_Down: SetScrollDelta(vec2i(0, -120  )); break;
 				default:break;
 				}
 			}

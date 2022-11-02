@@ -136,8 +136,11 @@ namespace Kek
 			default:
 				break;
 			}
-			if(key != Key_None && !keyCallback(key, int(isDown), key, (keyData->flags & LLKHF_INJECTED) != 0) && nCode >= 0) return 1;
-
+			if(key != Key_None)
+			{
+				if(!keyCallback(key, int(isDown), key, (keyData->flags & LLKHF_INJECTED) != 0) && nCode >= 0) return 1;
+			}
+			
 			return CallNextHookEx(mouseHook, nCode, wP, lP);
 		}
 
