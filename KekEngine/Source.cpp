@@ -30,7 +30,7 @@ void Kek::Setup()
 	SystemIO::scrollWheelEvent += Loggerwh;
 }
 void Kek::Update()
-{
+{ 
 	if(SystemIO::Key(Key_Escape) == State_Click) app.Close();
 	SystemIO::PollEvents();
 }
