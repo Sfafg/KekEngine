@@ -89,6 +89,7 @@ namespace Kek
 		Event<vec2i, FlagSet> scrollWheelEventAsync;
 		Event<vec2i, FlagSet> mouseMoveEventAsync;
 		FlagSet modulatorsAsync = 0;
+		vec2i mousePosAsync;
 
 		Event<int, int, int, FlagSet> keyEvent;
 		Event<vec2i, FlagSet> scrollWheelEvent;
@@ -99,15 +100,17 @@ namespace Kek
 		vec2i lastMousePos;
 		vec2i mouseDelta;
 	}
-
 	namespace SystemIO
 	{
-		bool KeyCallback(int key, int state, int code)
+		bool KeyCallback(int key, int state, int code, bool simulated)
 		{
+			if(simulated) Log<Info>("SIMULATED");
+
 			// Key mapping.
 			auto search = keyMap.find(key);
 			if(search != keyMap.end())
 			{
+				int key = search->second;
 				SetKey({ search->second,state });
 				return false;
 			}
@@ -123,22 +126,76 @@ namespace Kek
 
 			// Event Buffering.
 			eventBufferMutex.lock();
-			eventBuffer.push_back({EventType::Key, KeyEventData(key,state,code)});
+			eventBuffer.push_back({ EventType::Key, KeyEventData(key,state,code) });
 			eventBufferMutex.unlock();
 			return true;
 		}
-		bool ScrollCallback(vec2i delta)
+		bool ScrollCallback(vec2i delta, bool simulated)
 		{
+			// Event mapping.
+			if(delta.x > 0)
+			{
+				auto search = keyMap.find(Event_Scroll_Right);
+				if(search != keyMap.end())
+				{
+					SetKey({ search->second,1 });
+					return false;
+				}
+			}
+			if(delta.x < 0)
+			{
+				auto search = keyMap.find(Event_Scroll_Left);
+				if(search != keyMap.end())
+				{
+					SetKey({ search->second,1 });
+					return false;
+				}
+			}
+			if(delta.y > 0)
+			{
+				auto search = keyMap.find(Event_Scroll_Up);
+				if(search != keyMap.end())
+				{
+					SetKey({ search->second,1 });
+					return false;
+				}
+			}
+			if(delta.y < 0)
+			{
+				auto search = keyMap.find(Event_Scroll_Down);
+				if(search != keyMap.end())
+				{
+					SetKey({ search->second,1 });
+					return false;
+				}
+			}
+
 			scrollWheelEventAsync(delta, modulatorsAsync);
 
 			// Event Buffering.
 			eventBufferMutex.lock();
-			eventBuffer.push_back(EventData{ EventType::Scroll,ScrollEventData(delta)});
+			eventBuffer.push_back(EventData{ EventType::Scroll,ScrollEventData(delta) });
 			eventBufferMutex.unlock();
 			return true;
 		}
-		bool MouseMoveCallback(vec2i pos)
+		bool MouseMoveCallback(vec2i pos, bool simulated)
 		{
+			// Event mapping.
+			vec2i delta = pos - mousePosAsync;
+			mousePosAsync = pos;
+
+			if(delta.x > 0)
+			{
+				auto search = keyMap.find(Event_Mouse_Move_Right);
+				if(search != keyMap.end())
+				{
+					SetKey({ search->second,1 });
+					delta.x = 0;
+					SetMousePos(mousePosAsync + delta);
+					return false;
+				}
+			}
+
 			mouseMoveEventAsync(pos, modulatorsAsync);
 
 			// Event Buffering.
@@ -245,7 +302,23 @@ namespace Kek
 			DEBUGISINIT(initialized);
 #endif
 			if(key.index == Key_None) return;
-			PlatformIO::SetKey(key);
+			if(key.index <= Key_Last) PlatformIO::SetKey(key);
+			else
+			{
+				switch(key.index)
+				{
+				case Event_Mouse_Move_Left: SetMouseDelta(vec2i(-key.state, 0)); break;
+				case Event_Mouse_Move_Right: SetMouseDelta(vec2i(key.state, 0)); break;
+				case Event_Mouse_Move_Up: SetMouseDelta(vec2i(0, key.state)); break;
+				case Event_Mouse_Move_Down: SetMouseDelta(vec2i(0, -key.state)); break;
+
+				case Event_Scroll_Left: SetScrollDelta(vec2i(-120 * key.state, 0)); break;
+				case Event_Scroll_Right: SetScrollDelta(vec2i(120 * key.state, 0)); break;
+				case Event_Scroll_Up: SetScrollDelta(vec2i(0, 120 * key.state)); break;
+				case Event_Scroll_Down: SetScrollDelta(vec2i(0, -120 * key.state)); break;
+				default:break;
+				}
+			}
 		}
 		void MapKey(int keyA, int keyB)
 		{

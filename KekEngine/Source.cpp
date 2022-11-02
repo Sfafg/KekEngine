@@ -3,7 +3,7 @@
 #include "KekEngine/Core/Application.h"
 #include "KekEngine/SystemIO/SystemIO.h"
 /// LOOP WHEN MAPPING A TO B AND B TO A.
-/// ADD MAPPING TO EVENTS LIKE SCROLL.
+/// ADD INPUT CAPTURING TO EVENTS.
 
 using namespace Kek;
 
@@ -15,16 +15,17 @@ void Logger(int key, int state, int code, FlagSet modulators)
 	}
 	else Log<Warning>(KeyName(key), " ", StateName(state), " ");
 }
-
 void Loggerwh(vec2i delta, FlagSet modulators)
 {
 	Log<Warning>(delta);
 }
+
 Application app;
 void Kek::Setup()
 {
 	SystemIO::Init();
 
+	//SystemIO::MapKey(Event_Scroll_Up, Key_Space);
 	SystemIO::keyEvent += Logger;
 	SystemIO::scrollWheelEvent += Loggerwh;
 }

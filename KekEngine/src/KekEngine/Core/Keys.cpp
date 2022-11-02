@@ -159,10 +159,10 @@ namespace Kek
 		{Event_Mouse_Move_Right,"Mouse_Move_Right"},
 		{Event_Mouse_Move_Up,"Mouse_Move_Up"},
 		{Event_Mouse_Move_Down,"Mouse_Move_Down"},
-		{Event_Mouse_Scroll_Left,"Mouse_Scroll_Left"},
-		{Event_Mouse_Scroll_Right,"Mouse_Scroll_Right"},
-		{Event_Mouse_Scroll_Up,"Mouse_Scroll_Up"},
-		{Event_Mouse_Scroll_Down,"Mouse_Scroll_Down"}
+		{Event_Scroll_Left,"Mouse_Scroll_Left"},
+		{Event_Scroll_Right,"Mouse_Scroll_Right"},
+		{Event_Scroll_Up,"Mouse_Scroll_Up"},
+		{Event_Scroll_Down,"Mouse_Scroll_Down"}
 	};
 	const char* StateName(int state) { return stateNameMap.at(state); }
 	const char* KeyName(int key) { return keyNameMap.at(key); }

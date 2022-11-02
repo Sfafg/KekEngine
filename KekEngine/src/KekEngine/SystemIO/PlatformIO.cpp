@@ -68,9 +68,9 @@ namespace Kek
 		Hook keyboardHook;
 		Hook mouseHook;
 
-		FunctionPointer<bool, int, int, int> keyCallback;
-		FunctionPointer<bool, vec2i> mouseMoveCallback;
-		FunctionPointer<bool, vec2i> scrollWheelCallback;
+		FunctionPointer<bool, int, int, int, bool> keyCallback;
+		FunctionPointer<bool, vec2i, bool> mouseMoveCallback;
+		FunctionPointer<bool, vec2i, bool> scrollWheelCallback;
 
 		LRESULT CALLBACK KEYHookCallback(int nCode, WPARAM downParam, LPARAM keyDataParam)
 		{
@@ -78,7 +78,7 @@ namespace Kek
 			bool isDown = downParam == WM_KEYDOWN || downParam == WM_SYSKEYDOWN;
 			int key = WindowsToKey(keyData->vkCode);
 
-			if(!keyCallback(key, isDown, keyData->scanCode) && nCode >= 0) return 1;
+			if(!keyCallback(key, isDown, keyData->scanCode, (keyData->flags & LLKHF_INJECTED) != 0) && nCode >= 0) return 1;
 			return CallNextHookEx(keyboardHook, nCode, downParam, keyDataParam);
 	}
 		LRESULT CALLBACK MOUSEHookCallback(int nCode, WPARAM wP, LPARAM lP)
@@ -128,15 +128,15 @@ namespace Kek
 					uS = HIWORD(keyData->mouseData);
 					scrollD.x = *(short*)(&uS);
 				}
-				if(!scrollWheelCallback(scrollD) && nCode >= 0) return 1;
+				if(!scrollWheelCallback(scrollD, (keyData->flags & LLKHF_INJECTED) != 0) && nCode >= 0) return 1;
 				break;
 			case WM_MOUSEMOVE:
-				if(!mouseMoveCallback(vec2i(keyData->pt.x, keyData->pt.y)) && nCode >= 0) return 1;
+				if(!mouseMoveCallback(vec2i(keyData->pt.x, keyData->pt.y), (keyData->flags & LLKHF_INJECTED) != 0) && nCode >= 0) return 1;
 				break;
 			default:
 				break;
 			}
-			if(key != Key_None && !keyCallback(key, int(isDown), key) && nCode >= 0) return 1;
+			if(key != Key_None && !keyCallback(key, int(isDown), key, (keyData->flags & LLKHF_INJECTED) != 0) && nCode >= 0) return 1;
 
 			return CallNextHookEx(mouseHook, nCode, wP, lP);
 		}

@@ -30,7 +30,6 @@ namespace Kek
 		extern void SetScrollDelta(vec2i scrollDelta);
 		extern void SetKey(KeyData key);
 		extern void MapKey(int keyA, int keyB);
-		
 	}
 }
 
