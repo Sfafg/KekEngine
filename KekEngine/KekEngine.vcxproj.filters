@@ -84,6 +84,9 @@
     <ClCompile Include="src\KekEngine\SystemIO\SystemIO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\KekEngine\Core\Timing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\KekEngine\Maths\Byte.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\KekEngine\SystemIO\SystemIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\KekEngine\Core\Timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

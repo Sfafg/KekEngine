@@ -167,14 +167,11 @@ namespace Kek
 #pragma endregion
 #pragma region Events
 	const int Event_Unknown = State_None;
-	const int Event_Mouse_Move_Left = 126;
-	const int Event_Mouse_Move_Right = 127;
-	const int Event_Mouse_Move_Up = 128;
-	const int Event_Mouse_Move_Down = 129;
-	const int Event_Scroll_Left = 130;
-	const int Event_Scroll_Right = 131;
-	const int Event_Scroll_Up = 132;
-	const int Event_Scroll_Down = 133;
+	const int Event_Mouse_Move = 126;
+	const int Event_Scroll_Left = 127;
+	const int Event_Scroll_Right = 128;
+	const int Event_Scroll_Up = 129;
+	const int Event_Scroll_Down = 130;
 	const int Event_Last = Event_Scroll_Down;
 #pragma endregion
 }

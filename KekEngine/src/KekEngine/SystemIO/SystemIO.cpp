@@ -1,4 +1,5 @@
 #include "SystemIO.h"
+#include <thread>
 #include <map>
 #include <vector>
 #include <mutex>
@@ -54,6 +55,7 @@ namespace Kek
 	struct MouseEventData
 	{
 		vec2i pos;
+		vec2i delta;
 	};
 
 	struct EventData
@@ -87,13 +89,13 @@ namespace Kek
 	{
 		Event<int, int, int, FlagSet> keyEventAsync;
 		Event<vec2i, FlagSet> scrollWheelEventAsync;
-		Event<vec2i, FlagSet> mouseMoveEventAsync;
+		Event<vec2i, vec2i, FlagSet> mouseMoveEventAsync;
 		FlagSet modulatorsAsync = 0;
 		vec2i mousePosAsync;
 
 		Event<int, int, int, FlagSet> keyEvent;
 		Event<vec2i, FlagSet> scrollWheelEvent;
-		Event<vec2i, FlagSet> mouseMoveEvent;
+		Event<vec2i, vec2i, FlagSet> mouseMoveEvent;
 		FlagSet modulators = 0;
 		vec2i scrollDelta;
 		vec2i mousePos;
@@ -105,12 +107,22 @@ namespace Kek
 		bool KeyCallback(int key, int state, int code, bool simulated)
 		{
 			// Key mapping.
-			auto search = keyMap.find(key);
-			if(search != keyMap.end())
+			if(!simulated)
 			{
-				int key = search->second;
-				SetKey({ search->second,state });
-				return false;
+				auto search = keyMap.find(key);
+				if(search != keyMap.end())
+				{
+					if(key > Mouse_Last && key <= Key_Last || search->second > Mouse_Last && search->second <= Key_Last) SetKey({ search->second, state });
+					else
+					{
+						std::thread th([state]()
+							{
+								SetKey({ Mouse_Left, state });
+							});
+						th.detach();
+					}
+					return false;
+				}
 			}
 
 			// Async events.
@@ -131,40 +143,26 @@ namespace Kek
 		bool ScrollCallback(vec2i delta, bool simulated)
 		{
 			// Event mapping.
-			if(delta.x > 0)
+			if(!simulated)
 			{
-				auto search = keyMap.find(Event_Scroll_Right);
-				if(search != keyMap.end())
-				{
-					SetKey({ search->second,State_Click });
-					return false;
-				}
-			}
-			if(delta.x < 0)
-			{
-				auto search = keyMap.find(Event_Scroll_Left);
-				if(search != keyMap.end())
-				{
-					SetKey({ search->second,State_Click });
-					return false;
-				}
-			}
+				std::map<int, int>::iterator search;
+				if(delta.x > 0)search = keyMap.find(Event_Scroll_Right);
+				else if(delta.x < 0)search = keyMap.find(Event_Scroll_Left);
 
-			if(delta.y > 0)
-			{
-				auto search = keyMap.find(Event_Scroll_Up);
+				if(delta.y > 0) search = keyMap.find(Event_Scroll_Up);
+				else if(delta.y < 0)search = keyMap.find(Event_Scroll_Down);
+
 				if(search != keyMap.end())
 				{
-					SetKey({ search->second,State_Click });
-					return false;
-				}
-			}
-			if(delta.y < 0)
-			{
-				auto search = keyMap.find(Event_Scroll_Down);
-				if(search != keyMap.end())
-				{
-					SetKey({ search->second,State_Click });
+					if(search->second > Mouse_Last && search->second <= Key_Last) SetKey({ search->second, State_Click });
+					else
+					{
+						std::thread th([search]()
+							{
+								SetKey({ search->second, State_Click });
+							});
+						th.detach();
+					}
 					return false;
 				}
 			}
@@ -183,23 +181,29 @@ namespace Kek
 			vec2i delta = pos - mousePosAsync;
 			mousePosAsync = pos;
 
-			if(delta.x > 0)
+			if(!simulated)
 			{
-				auto search = keyMap.find(Event_Mouse_Move_Right);
+				auto search = keyMap.find(Event_Mouse_Move);
 				if(search != keyMap.end())
 				{
-					SetKey({ search->second,State_Click });
-					delta.x = 0;
-					SetMousePos(mousePosAsync + delta);
+					if(search->second > Mouse_Last && search->second <= Key_Last) SetKey({ search->second, State_Click });
+					else
+					{
+						std::thread th([search]()
+							{
+								SetKey({ search->second, State_Click });
+							});
+						th.detach();
+					}
 					return false;
 				}
 			}
 
-			mouseMoveEventAsync(pos, modulatorsAsync);
+			mouseMoveEventAsync(pos, delta, modulatorsAsync);
 
 			// Event Buffering.
 			eventBufferMutex.lock();
-			eventBuffer.push_back(EventData{ EventType::Mouse,MouseEventData(pos) });
+			eventBuffer.push_back(EventData{ EventType::Mouse,MouseEventData(pos,delta) });
 			eventBufferMutex.unlock();
 			return true;
 		}
@@ -243,7 +247,7 @@ namespace Kek
 				{
 					mousePos = e.mouse.pos;
 					mouseDelta = lastMousePos - mousePos;
-					mouseMoveEvent(e.mouse.pos, modulators);
+					mouseMoveEvent(e.mouse.pos, e.mouse.delta, modulators);
 					break;
 				}
 				default:break;
@@ -306,15 +310,12 @@ namespace Kek
 			{
 				switch(key.index)
 				{
-				case Event_Mouse_Move_Left: SetMouseDelta(vec2i(-1, 0)); break;
-				case Event_Mouse_Move_Right: SetMouseDelta(vec2i(1, 0)); break;
-				case Event_Mouse_Move_Up: SetMouseDelta(vec2i(0, 1)); break;
-				case Event_Mouse_Move_Down: SetMouseDelta(vec2i(0, -1)); break;
+				case Event_Mouse_Move: SetMouseDelta(vec2i(1, 0)); break;
 
-				case Event_Scroll_Left: SetScrollDelta(vec2i(-120 , 0)); break;
-				case Event_Scroll_Right: SetScrollDelta(vec2i(120  , 0)); break;
-				case Event_Scroll_Up: SetScrollDelta(vec2i(0, 120  )); break;
-				case Event_Scroll_Down: SetScrollDelta(vec2i(0, -120  )); break;
+				case Event_Scroll_Left: SetScrollDelta(vec2i(-120, 0)); break;
+				case Event_Scroll_Right: SetScrollDelta(vec2i(120, 0)); break;
+				case Event_Scroll_Up: SetScrollDelta(vec2i(0, 120)); break;
+				case Event_Scroll_Down: SetScrollDelta(vec2i(0, -120)); break;
 				default:break;
 				}
 			}

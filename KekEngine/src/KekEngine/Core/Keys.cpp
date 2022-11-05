@@ -155,10 +155,7 @@ namespace Kek
 	};
 	const std::map<int, const char*> eventNameMap
 	{
-		{Event_Mouse_Move_Left,"Mouse_Move_Left"},
-		{Event_Mouse_Move_Right,"Mouse_Move_Right"},
-		{Event_Mouse_Move_Up,"Mouse_Move_Up"},
-		{Event_Mouse_Move_Down,"Mouse_Move_Down"},
+		{Event_Mouse_Move,"Mouse_Move"},
 		{Event_Scroll_Left,"Mouse_Scroll_Left"},
 		{Event_Scroll_Right,"Mouse_Scroll_Right"},
 		{Event_Scroll_Up,"Mouse_Scroll_Up"},

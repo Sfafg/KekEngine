@@ -13,7 +13,7 @@ namespace Kek
 
 		extern Event<int, int, int, FlagSet> keyEvent;
 		extern Event<vec2i, FlagSet> scrollWheelEvent;
-		extern Event<vec2i, FlagSet> mouseMoveEvent;
+		extern Event<vec2i, vec2i, FlagSet> mouseMoveEvent;
 
 		extern FlagSet modulators;
 		extern vec2i mousePos;
@@ -23,7 +23,7 @@ namespace Kek
 
 		extern Event<int, int, int, FlagSet> keyEventAsync;
 		extern Event<vec2i, FlagSet> scrollWheelEventAsync;
-		extern Event<vec2i, FlagSet> mouseMoveEventAsync;
+		extern Event<vec2i, vec2i, FlagSet> mouseMoveEventAsync;
 
 		extern void SetMousePos(vec2i pos);
 		extern void SetMouseDelta(vec2i delta);

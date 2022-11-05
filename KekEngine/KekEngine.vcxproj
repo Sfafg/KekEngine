@@ -204,6 +204,7 @@
     <ClCompile Include="ThridParty\GLAD\glad\src\glad.c" />
     <ClCompile Include="src\KekEngine\Core\Windows_Keys.cpp" />
     <ClCompile Include="src\KekEngine\SystemIO\PlatformIO.cpp" />
+    <ClCompile Include="src\KekEngine\Core\Timing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\KekEngine\Core\Clock.h" />
@@ -228,6 +229,7 @@
     <ClInclude Include="src\KekEngine\Core\Windows_Keys.h" />
     <ClInclude Include="src\KekEngine\SystemIO\PlatformIO.h" />
     <ClInclude Include="src\KekEngine\SystemIO\SystemIO.h" />
+    <ClInclude Include="src\KekEngine\Core\Timing.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
