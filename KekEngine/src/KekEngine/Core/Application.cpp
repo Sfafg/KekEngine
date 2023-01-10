@@ -1,110 +1,109 @@
 #include "Application.h"
-#include "KekEngine/Graphics/Context.h"
+#include "Context.h"
 #include "GLFW/glfw3.h"
 #pragma comment(linker, "/ENTRY:mainCRTStartup")
 using namespace Kek;
 
-Window** window = NULL;
-int windowCount = 0;
-bool shouldClose = false;
-
-Event<>& Application::FrameEndEvent() {static Event<> event; return event;}
-
-void Quit()
-{
-	for(int i = 0; i < windowCount; i++)
-	{
-		window[i]->Destroy();
-		delete window[i];
-	}
-	SystemContext::Terminate();
-}
-
 int main()
 {
 	Setup();
-	while(!Application::Closed())
+	while (!Application::IsQuitting())
 	{
 		glfwPollEvents();
 
 		Update();
 		Application::FrameEndEvent()();
 
-		for(int i = Application::WindowCount() - 1; i >= 0; i--)
-			if(Application::GetWindow(i).Closed())
+		for (int i = Application::WindowCount() - 1; i >= 0; i--)
+			if (Application::GetWindow(i).Closed())
 				Application::DeleteWindow(i);
 	}
-	Quit();
+	for (int i = Application::WindowCount() - 1; i >= 0; i--)
+	{
+		Application::DeleteWindow(i);
+	}
+	SystemContext::Terminate();
 
 	return 0;
 }
 
 namespace Kek
 {
-	Application::Application(const Window& window)
+	Window **Application::windowArray = NULL;
+	int Application::windowCount = 0;
+	bool Application::shouldQuit = false;
+
+	Application::Application(const Window &window)
 	{
+		SystemContext::Initialize();
 		AddWindow(window);
 	}
 	Application::Application()
 	{
-		SystemContext::Init();
+		SystemContext::Initialize();
 	}
 
-	const Window& Application::operator[](unsigned int index) const
+	Event<> &Application::FrameEndEvent()
 	{
-		return *window[index];
-	}
-	Window& Application::operator[](unsigned int index)
-	{
-		return *window[index];
+		static Event<> event;
+		return event;
 	}
 
-	void Application::Close()
+	const Window &Application::operator[](unsigned int index) const
 	{
-		shouldClose = true;
+		return *windowArray[index];
 	}
-	bool Application::Closed()
+	Window &Application::operator[](unsigned int index)
 	{
-		return shouldClose;
+		return *windowArray[index];
+	}
+
+	void Application::Quit()
+	{
+		shouldQuit = true;
+	}
+	bool Application::IsQuitting()
+	{
+		return shouldQuit;
 	}
 
 	int Application::WindowCount() { return windowCount; }
 
-	void Application::AddWindow(Window* _window)
+	void Application::AddWindow(Window *_window)
 	{
 		Realloc(windowCount + 1);
-		window[windowCount - 1] = _window;
+		windowArray[windowCount - 1] = _window;
 	}
-	void Application::AddWindow(const Window& _window)
+	void Application::AddWindow(const Window &_window)
 	{
 		Realloc(windowCount + 1);
-		window[windowCount - 1] = new Window(_window);
-		GraphicsContext::Init(4,6);
+		windowArray[windowCount - 1] = new Window(_window);
 	}
-	Window& Application::GetWindow(int index)
+	Window &Application::GetWindow(int index)
 	{
-		return *window[index];
+		return *windowArray[index];
 	}
 	void Application::DeleteWindow(int index)
 	{
-		window[index]->Destroy();
-		delete window[index];
+		windowArray[index]->Destroy();
+		delete windowArray[index];
 
-		for(int i = index; i < windowCount - 1; i++)
+		for (int i = index; i < windowCount - 1; i++)
 		{
-			window[i] = window[i + 1];
+			windowArray[i] = windowArray[i + 1];
 		}
 		Realloc(windowCount - 1);
 	}
 
 	void Application::Realloc(int size)
 	{
-		if(windowCount == size)return;
+		if (windowCount == size)
+			return;
 		windowCount = size;
-		void* ptr = realloc(window, size * sizeof(Window*));
-		if(ptr != NULL)
+		void *ptr = realloc(windowArray, size * sizeof(Window *));
+		if (ptr != NULL)
 		{
-			window = (Window**)ptr;
+			windowArray = (Window **)ptr;
 		}
 	}
 }

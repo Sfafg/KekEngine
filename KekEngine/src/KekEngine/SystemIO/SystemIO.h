@@ -32,4 +32,3 @@ namespace Kek
 		extern void MapKey(int keyA, int keyB);
 	}
 }
-

@@ -74,14 +74,14 @@ namespace Kek
 						value[i][j] = (i == j);
 			}
 		}
-		mat(T a)
+		explicit mat(T a)
 		{
 			for(int i = 0; i < TRows; i++)
 				for(int j = 0; j < TColumns; j++)
 					value[i][j] = a;
 		}
-		mat(const vec<TRows>& data) { memcpy(value, data, Size() * sizeof(T)); }
-		mat(const vec<TRows, vec<TColumns, T>>& data) { memcpy(value, data, Size() * sizeof(T)); }
+		mat(const vec<TRows>& data) { memcpy(value, (void*)&data, Size() * sizeof(T)); }
+		mat(const vec<TRows, vec<TColumns, T>>& data) { memcpy(value, (void*)&data, Size() * sizeof(T)); }
 		mat(T const (&data)[TRows * TColumns])
 		{
 			memcpy(value, data, Size() * sizeof(T));
@@ -121,8 +121,7 @@ namespace Kek
 	template <unsigned int TRows, unsigned int TColumns, typename T = float>
 	std::ostream& operator<<(std::ostream& os, const mat<TRows, TColumns, T>& m)
 	{
-		os << "[{LCyan}]<mat" << TRows << 'x' << TColumns << typeid(T).name()[0] << ">\n";
-		os << "[{LYellow}]<";
+		os << "mat" << TRows << 'x' << TColumns << typeid(T).name()[0] << "\n";
 		for(int i = 0; i < TRows - 1; i++)
 		{
 			os << '|';

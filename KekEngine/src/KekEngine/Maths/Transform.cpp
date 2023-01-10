@@ -15,22 +15,20 @@ namespace Kek
 	}
 	vec2f Transform2D::Right()
 	{
-		return matrix.TransformDir({ 1,0 });
+		return matrix.TransformDir({1, 0});
 	}
 	vec2f Transform2D::Up()
 	{
-		return matrix.TransformDir({ 0,1 });
+		return matrix.TransformDir({0, 1});
 	}
 
-	std::ostream& operator<<(std::ostream& os, const Transform2D& tr)
+	std::ostream &operator<<(std::ostream &os, const Transform2D &tr)
 	{
-		os << "[{LCyan}]<Transform2D >\n";
-		os << "[4{LYellow}]<";
+		os << "Transform2D\n";
 		os << tr.position << '\n';
 		os << tr.scale << '\n';
 		os << tr.rotation << '\n';
 		os << tr.matrix << '\n';
-		os << '>';
 		return os;
 	}
 
@@ -47,22 +45,20 @@ namespace Kek
 	}
 	vec3f Transform3D::Right()
 	{
-		return matrix.TransformDir({ 1,0 });
+		return matrix.TransformDir({1, 0});
 	}
 	vec3f Transform3D::Up()
 	{
-		return matrix.TransformDir({ 0,1 });
+		return matrix.TransformDir({0, 1});
 	}
 
-	std::ostream& operator<<(std::ostream& os, const Transform3D& tr)
+	std::ostream &operator<<(std::ostream &os, const Transform3D &tr)
 	{
-		os << "[{LCyan}]<Transform3D >\n";
-		os << "[4{LYellow}]<";
+		os << "Transform3D\n";
 		os << tr.position << '\n';
 		os << tr.scale << '\n';
 		os << tr.rotation << '\n';
 		os << tr.matrix << '\n';
-		os << '>';
 		return os;
 	}
 }

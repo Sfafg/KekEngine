@@ -1,4 +1,5 @@
 #include "Timing.h"
+#include "Clock.h"
 
 namespace Kek
 {

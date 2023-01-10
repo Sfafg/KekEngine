@@ -4,8 +4,10 @@ namespace Kek
 {
 	void Byte::Write(int position, bool state)
 	{
-		if(state) Byte::Set(position);
-		else Byte::Unset(position);
+		if (state)
+			Byte::Set(position);
+		else
+			Byte::Unset(position);
 	}
 	void Byte::Set(int position)
 	{
@@ -26,20 +28,19 @@ namespace Kek
 	Byte::Byte(unsigned char value) : value(value)
 	{
 	}
-	Byte::operator unsigned char& ()
+	Byte::operator unsigned char &()
 	{
 		return value;
 	}
 
-	std::ostream& operator<<(std::ostream& os, const Byte& o)
+	std::ostream &operator<<(std::ostream &os, const Byte &o)
 	{
-		os << "[{LCyan}]<Byte:>";
-		os << "[{LYellow}]<";
-		for(int i = 7; i >= 0; i--)
+		os << "Byte(";
+		for (int i = 7; i >= 0; i--)
 		{
 			os << o.Get(i);
 		}
-		os << '>';
+		os << ')';
 		return os;
 	}
 }

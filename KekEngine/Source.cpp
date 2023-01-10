@@ -1,69 +1,43 @@
 #include "KekEngine/Core/Log.h"
-#include "KekEngine/Maths/Byte.h"
 #include "KekEngine/Core/Application.h"
-#include "KekEngine/SystemIO/SystemIO.h"
+#include "KekEngine/Graphics/VertexArray.h"
+#include "KekEngine/Graphics/Shader.h"
+#include "KekEngine/Graphics/Shaders.h"
 
-#include "KekEngine/Core/Timing.h"
 using namespace Kek;
+using namespace Graphics;
 
-bool isMapped = false;
-void MapKey(int key, int state, int code, FlagSet mods)
+// Improve window constructors.
+// TOKENS // LOG LINE AND FILE OF ERRORS AND WARNINGS // AUTO SPACE BETWEEN ARGUMENTS
+// Window has a renderer which is initialized things are getting drown to a specific window.
+
+Application app({ "KekEngine",vec2i(800,600) });
+Shader shader(vertexShaderSource, fragmentShaderSource);
+
+struct Vertex
 {
-	if(state == State_Release || !mods.IsUp(Mod_Shift)) return;
-	if(key == Key_Escape)
-	{
-		Application::Close();
-	}
-	if(key == Key_Enter)
-	{
-		if(isMapped)
-		{
-			SystemIO::MapKey(Event_Scroll_Up, Event_Scroll_Up);
-			SystemIO::MapKey(Event_Scroll_Down, Event_Scroll_Down);
-			SystemIO::MapKey(Key_Space, Key_Space);
-			SystemIO::MapKey(Mouse_Middle, Mouse_Middle);
-			SystemIO::MapKey(Mouse_4, Mouse_4);
-			SystemIO::MapKey(Mouse_5, Mouse_5);
-		}
-		else
-		{
-			SystemIO::MapKey(Event_Scroll_Up, Key_Comma);
-			SystemIO::MapKey(Event_Scroll_Down, Key_Period);
-			SystemIO::MapKey(Key_Space, Key_Backspace);
-			SystemIO::MapKey(Mouse_Middle, Key_6);
-			SystemIO::MapKey(Mouse_4, Key_7);
-			SystemIO::MapKey(Mouse_5, Key_5);
-		}
-		isMapped = !isMapped;
-	}
-}
-
-void Time(int key, int state, int code, FlagSet mods)
-{
-	if(state == State_Release) return;
-
-	if(key == Key_S)
-	{
-		Log<Info>("Took [{LCyan}]<", Timing::GetTiming() * Microseconds, Microseconds, "> to simulate input.");
-	}
-
-}
-void Time2(vec2i delta, FlagSet mods)
-{
-	Timing::RestartTiming();
-	SystemIO::SetKey({ Key_S, State_Click });
-}
-Application app;
+    vec2f pos;
+    vec3f col;
+};
+VertexArray1<Vertex, unsigned char> mesh({{FLOAT, 2}, {FLOAT, 3}});
 void Kek::Setup()
 {
-	SystemIO::Init();
-	//SystemIO::MapKey(Event_Scroll_Down, Key_S);
-	//SystemIO::keyEventAsync += MapKey;
-	SystemIO::keyEventAsync += Time;
-	SystemIO::scrollWheelEventAsync += Time2;
+    mesh.AddVertices({{vec2f(0.5f, 0.5f), vec3f(1, 1, 0)},
+                      {vec2f(0.5f, -0.5f), vec3f(1, 0, 0)},
+                      {vec2f(-0.5f, 0.5f), vec3f(0, 1, 0)},
+                      {vec2f(-0.5f, -0.5f), vec3f(0, 0, 0)}});
+    mesh.AddIndices({0, 1, 2, 2, 1, 3});
 }
-
 void Kek::Update()
 {
-	SystemIO::PollEvents();
+
+    if (app.WindowCount() == 0 || app[0].GetKey(KEY_ESCAPE))
+    {
+        app.Quit();
+        return;
+    }
+    shader.Bind();
+    mesh.Draw();
+
+    app[0].SwapBuffers();
 }

@@ -1,61 +1,32 @@
 #pragma once
 #include <iosfwd>
+#include <source_location>
 #include "Console.h"
-#include "KekEngine/Core/Flag.h"
 
 namespace Kek
 {
-	/// <summary>
-	/// Enum that specifies how to Log the string.
-	/// </summary>
-	enum LogType
+	enum LOGTYPE
 	{
-		None = 0,
-		Raw = 1,
-		Info = 2,
-		Warning = 4,
-		Error = 8
+		NONE = 0,
+		RAW = 1,
+		INFO = 2,
+		WARNING = 4,
+		ERROR = 8
 	};
 
 	namespace Debug
 	{
-		/// <summary>
-		/// Console Interface holding refrence to Console object.
-		/// </summary>
-		IConsole* Console();
-#ifndef NDEBUG;
-		FlagSet& Mask();
-#endif // Debug_Mode;
+		IConsole &Console();
 	};
 
-	/// <summary>
-	/// Function Logging string with specific LogType specified as function Template.
-	/// </summary>
-	/// <param name="str">String_view parameter to log.</param>
-	template <LogType Type = LogType::None>
-	void Log(const std::string_view& str);
+	template <LOGTYPE Type = LOGTYPE::NONE>
+	void Log(const std::string_view &str);
 
-
-	/// <summary>
-	/// Printf-like function using variadic templates.
-	/// <para />Formatting format:
-	/// <para />[] -> Sequence [start, end]
-	/// <para />&lt;&gt; -> Sequence Scope Limits
-	/// <para />FG -> Foreground Color
-	/// <para />BG -> Background Color
-	/// <para /> {ColorName} #FFFFFF (r/g/b) -> Color [0...255]
-	/// <para />B -> Bold
-	/// <para />_ -> underline
-	/// <para />&gt;/&lt;(num) -> add/remove indention
-	/// <para />(num) -> set indention
-	/// </summary>
-	/// <typeparam name="...T"></typeparam>
-	/// <param name="...o"></param>
-	template <LogType Type = LogType::None, typename... T>
-	void Log(const T&... o)
+	template <LOGTYPE Type = LOGTYPE::NONE, typename... T>
+	void Log(const T &...o)
 	{
 		std::stringstream ss;
-		((ss << o), ...);
+		((ss << o << ' '), ...);
 
 		Log<Type>((std::string_view)ss.str());
 	}

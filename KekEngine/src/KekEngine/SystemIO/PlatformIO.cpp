@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <thread>
 
+#undef ERROR
+
 class Hook
 {
 	HHOOK hook;
@@ -15,7 +17,7 @@ class Hook
 	{
 		if(hook == NULL) return;
 		UnhookWindowsHookEx(hook);
-		Kek::Log<Kek::Info>("Unhooking.");
+		Kek::Log<Kek::INFO>("Unhooking.");
 	}
 	Hook& operator=(const HHOOK& hook_) { hook = hook_; return *this; }
 	operator HHOOK () { return hook; }
@@ -60,10 +62,6 @@ namespace Kek
 		Hook keyboardHook;
 		Hook mouseHook;
 
-		FunctionPointer<bool, int, int, int, bool> keyCallback;
-		FunctionPointer<bool, vec2i, bool> mouseMoveCallback;
-		FunctionPointer<bool, vec2i, bool> scrollWheelCallback;
-
 		LRESULT CALLBACK KEYHookCallback(int nCode, WPARAM downParam, LPARAM keyDataParam)
 		{
 			if(nCode < 0) return CallNextHookEx(keyboardHook, nCode, downParam, keyDataParam);
@@ -72,7 +70,7 @@ namespace Kek
 			bool isDown = downParam == WM_KEYDOWN || downParam == WM_SYSKEYDOWN;
 			int key = WindowsToKey(keyData->vkCode);
 
-			if(!keyCallback(key, isDown, keyData->scanCode, keyData->flags & LLKHF_INJECTED)) return 1;
+			if(!KeyCallback(key, isDown, keyData->scanCode, keyData->flags & LLKHF_INJECTED)) return 1;
 			return CallNextHookEx(keyboardHook, nCode, downParam, keyDataParam);
 		}
 		LRESULT CALLBACK MOUSEHookCallback(int nCode, WPARAM wP, LPARAM lP)
@@ -85,64 +83,64 @@ namespace Kek
 			{
 			case WM_LBUTTONDBLCLK:
 			case WM_LBUTTONDOWN:
-				if(!keyCallback(Mouse_1, State_Press, Mouse_1, keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!KeyCallback(MOUSE_1, STATE_PRESS, MOUSE_1, keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			case WM_LBUTTONUP:
-				if(!keyCallback(Mouse_1, State_Release, Mouse_1, keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!KeyCallback(MOUSE_1, STATE_RELEASE, MOUSE_1, keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			case WM_RBUTTONDBLCLK:
 			case WM_RBUTTONDOWN:
-				if(!keyCallback(Mouse_2, State_Press, Mouse_2, keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!KeyCallback(MOUSE_2, STATE_PRESS, MOUSE_2, keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			case WM_RBUTTONUP:
-				if(!keyCallback(Mouse_2, State_Release, Mouse_2, keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!KeyCallback(MOUSE_2, STATE_RELEASE, MOUSE_2, keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			case WM_MBUTTONDBLCLK:
 			case WM_MBUTTONDOWN:
-				if(!keyCallback(Mouse_3, State_Press, Mouse_3, keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!KeyCallback(MOUSE_3, STATE_PRESS, MOUSE_3, keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			case WM_MBUTTONUP:
-				if(!keyCallback(Mouse_3, State_Release, Mouse_3, keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!KeyCallback(MOUSE_3, STATE_RELEASE, MOUSE_3, keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			case WM_XBUTTONDBLCLK:
 			case WM_XBUTTONDOWN:
 				if(HIWORD(keyData->mouseData) == XBUTTON1)
 				{
-					if(!keyCallback(Mouse_4, State_Press, Mouse_4, keyData->flags & LLKHF_INJECTED)) return 1;
+					if(!KeyCallback(MOUSE_4, STATE_PRESS, MOUSE_4, keyData->flags & LLKHF_INJECTED)) return 1;
 				}
 				else
 				{
-					if(!keyCallback(Mouse_5, State_Press, Mouse_5, keyData->flags & LLKHF_INJECTED)) return 1;
+					if(!KeyCallback(MOUSE_5, STATE_PRESS, MOUSE_5, keyData->flags & LLKHF_INJECTED)) return 1;
 				}
 				break;
 
 			case WM_XBUTTONUP:
 				if(HIWORD(keyData->mouseData) == XBUTTON1)
 				{
-					if(!keyCallback(Mouse_4, State_Release, Mouse_4, keyData->flags & LLKHF_INJECTED)) return 1;
+					if(!KeyCallback(MOUSE_4, STATE_RELEASE, MOUSE_4, keyData->flags & LLKHF_INJECTED)) return 1;
 				}
 				else
 				{
-					if(!keyCallback(Mouse_5, State_Release, Mouse_5, keyData->flags & LLKHF_INJECTED)) return 1;
+					if(!KeyCallback(MOUSE_5, STATE_RELEASE, MOUSE_5, keyData->flags & LLKHF_INJECTED)) return 1;
 				}
 				break;
 
 			case WM_MOUSEWHEEL:
-				if(!scrollWheelCallback(vec2i(0, (short)HIWORD(keyData->mouseData)), keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!ScrollCallback(vec2i(0, (short)HIWORD(keyData->mouseData)), keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			case WM_MOUSEHWHEEL:
-				if(!scrollWheelCallback(vec2i((short)HIWORD(keyData->mouseData), 0), keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!ScrollCallback(vec2i((short)HIWORD(keyData->mouseData), 0), keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			case WM_MOUSEMOVE:
-				if(!mouseMoveCallback(vec2i(keyData->pt.x, keyData->pt.y), keyData->flags & LLKHF_INJECTED)) return 1;
+				if(!MouseMoveCallback(vec2i(keyData->pt.x, keyData->pt.y), keyData->flags & LLKHF_INJECTED)) return 1;
 				break;
 
 			default: break;
@@ -157,19 +155,19 @@ namespace Kek
 #ifndef NDEBUG
 			if(initialized)
 			{
-				Log<Error>("You must NOT initialize PlatformIO more then once.");
+				Log<ERROR>("You must NOT initialize PlatformIO more then once.");
 			}
 			initialized = true;
 #endif // !NDEBUG
 			std::thread thread([]()
 				{
 					if(!(keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KEYHookCallback, NULL, NULL)))
-						Log<Error>("Failed to install KeyboardHook hook.");
-					else Log<Info>("Installed KeyboardHook hook.");
+						Log<ERROR>("Failed to install KeyboardHook hook.");
+					else Log<INFO>("Installed KeyboardHook hook.");
 
 					if(!(mouseHook = SetWindowsHookEx(WH_MOUSE_LL, MOUSEHookCallback, NULL, NULL)))
-						Log<Error>("Failed to install MouseHook hook.");
-					else Log<Info>("Installed MouseHook hook.");
+						Log<ERROR>("Failed to install MouseHook hook.");
+					else Log<INFO>("Installed MouseHook hook.");
 
 					MSG Msg;
 					while(GetMessage(&Msg, NULL, 0, 0))
@@ -186,12 +184,12 @@ namespace Kek
 			int windowsKey = KeyToWindows(key.index);
 			if(windowsKey == -1)
 			{
-				Log<Warning>("Windows does not support ", key.index, " key.");
+				Log<WARNING>("Windows does not support ", key.index, " key.");
 				return;
 			}
-			if(key.index > Mouse_Last)
+			if(key.index > MOUSE_LAST)
 			{
-				if(key.state == State_Click)
+				if(key.state == STATE_CLICK)
 				{
 					INPUT inputs[2]{};
 					ZeroMemory(inputs, sizeof(inputs));
@@ -207,14 +205,14 @@ namespace Kek
 					INPUT inputs[1]{};
 					ZeroMemory(inputs, sizeof(inputs));
 
-					KeyToInput(inputs[0], windowsKey, key.state == State_Press);
+					KeyToInput(inputs[0], windowsKey, key.state == STATE_PRESS);
 
 					UINT uSent = SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
 				}
 			}
 			else
 			{
-				if(key.state == State_Click)
+				if(key.state == STATE_CLICK)
 				{
 					INPUT inputs[2]{};
 					ZeroMemory(inputs, sizeof(inputs));
@@ -229,7 +227,7 @@ namespace Kek
 					INPUT inputs[1]{};
 					ZeroMemory(inputs, sizeof(inputs));
 
-					ButtonToInput(inputs[0], windowsKey, key.state == State_Press);
+					ButtonToInput(inputs[0], windowsKey, key.state == STATE_PRESS);
 
 					UINT uSent = SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
 				}

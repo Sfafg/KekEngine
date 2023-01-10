@@ -1,14 +1,13 @@
 #pragma once
-
 namespace Kek
 {
 	namespace SystemContext
 	{
-		extern bool Init();
+		extern bool Initialize();
 		extern void Terminate();
 	}
 	namespace GraphicsContext
 	{
-		extern bool Init(int majorVersion, int minorVersion);
+		extern bool Initialize();
 	}
 }

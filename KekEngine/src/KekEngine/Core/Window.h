@@ -3,16 +3,19 @@
 #include "KekEngine/Core/Events.h"
 #include "KekEngine/Core/Monitor.h"
 #include "KekEngine/Core/Flag.h"
-
+#include "Keys.h"
+#include "GLFW_Keys.h"
 
 namespace Kek
 {
 	struct WindowStyle
 	{
-		const static char None = 0,
+		const static char
+			None = 0,
 			Fullscreen = 1,
 			Borderless = 2,
 			Floating = 4,
+			Transparent = 8,
 			WindowedFullscreen = Fullscreen | Borderless,
 			FloatingBorderless = Floating | Borderless;
 	};
@@ -62,6 +65,7 @@ namespace Kek
 		Monitor GetMonitor();
 		void SetMonitor(Monitor monitor);
 
+		void Clear(vec4f col);
 		void SwapBuffers();
 		void SetAttribute(int attrib, int value);
 		void ContextCurrent();

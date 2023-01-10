@@ -8,9 +8,9 @@ namespace Kek
 	namespace PlatformIO
 	{
 		extern void Init();
-		extern FunctionPointer<bool, int, int, int, bool> keyCallback;
-		extern FunctionPointer<bool, vec2i, bool> mouseMoveCallback;
-		extern FunctionPointer<bool, vec2i, bool> scrollWheelCallback;
+		extern bool KeyCallback(int key, int state, int code, bool isSimulated);
+		extern bool MouseMoveCallback(vec2i position, bool isSimulated);
+		extern bool ScrollCallback(vec2i delta, bool isSimulated);
 
 		extern void SetKey(KeyData key);
 		extern void SetScrollDelta(vec2i scrollDelta);

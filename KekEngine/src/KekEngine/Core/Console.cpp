@@ -7,10 +7,9 @@
 namespace Kek
 {
 	ColorTable IConsole::colorTable;
-	colRGB8i& TableColor(int index)
+	colRGB8i &TableColor(int index)
 	{
-		static colRGB8i colorTable[]
-		{
+		static colRGB8i colorTable[]{
 			colRGB8i(242, 242, 242),
 			colRGB8i(12, 12, 12),
 			colRGB8i(0, 55, 218),
@@ -26,44 +25,44 @@ namespace Kek
 			colRGB8i(97, 214, 214),
 			colRGB8i(231, 72, 86),
 			colRGB8i(180, 0, 158),
-			colRGB8i(249, 241, 165)
-		};
+			colRGB8i(249, 241, 165)};
 
 		return colorTable[index];
 	}
-	std::map<std::string, int>& ColorMap()
+	std::map<std::string, int> &ColorMap()
 	{
-		static std::map<std::string, int> colorMap
-		{
-				{"White"   ,0},
-				{"Black"   ,1},
-				{"Blue"    ,2},
-				{"Green"   ,3},
-				{"Cyan"    ,4},
-				{"Red"     ,5},
-				{"Magenta" ,6},
-				{"Yellow"  ,7},
-				{"Gray"    ,8},
-				{"LGray"   ,9},
-				{"LBlue"   ,10},
-				{"LGreen"  ,11},
-				{"LCyan"   ,12},
-				{"LRed"    ,13},
-				{"LMagenta",14},
-				{"LYellow" ,15}
-		};
+		static std::map<std::string, int> colorMap{
+			{"White", 0},
+			{"Black", 1},
+			{"Blue", 2},
+			{"Green", 3},
+			{"Cyan", 4},
+			{"Red", 5},
+			{"Magenta", 6},
+			{"Yellow", 7},
+			{"Gray", 8},
+			{"LGray", 9},
+			{"LBlue", 10},
+			{"LGreen", 11},
+			{"LCyan", 12},
+			{"LRed", 13},
+			{"LMagenta", 14},
+			{"LYellow", 15}};
 
 		return colorMap;
 	}
 
-	bool ColorTable::isValidName(const std::string& str)
+	bool ColorTable::isValidName(const std::string &str)
 	{
 		return ColorMap().contains(str);
 	}
-	colRGB8i ColorTable::operator[](const std::string& str)
+	colRGB8i ColorTable::operator[](const std::string &str)
 	{
 		auto search = ColorMap().find(str);
-		if(search == ColorMap().end()){ return colRGB8i(255, 255, 255); }
+		if (search == ColorMap().end())
+		{
+			return colRGB8i(255, 255, 255);
+		}
 		return TableColor(search->second);
 	}
 	colRGB8i ColorTable::operator[](int ind)
@@ -71,11 +70,11 @@ namespace Kek
 		return TableColor(ind);
 	}
 
-	void IConsole::SetColor(const std::string& colorName) { SetColor(colorTable[colorName]); }
-	void IConsole::SetBackColor(const std::string& colorName) { SetBackColor(colorTable[colorName]); }
+	void IConsole::SetColor(const std::string &colorName) { SetColor(colorTable[colorName]); }
+	void IConsole::SetBackColor(const std::string &colorName) { SetBackColor(colorTable[colorName]); }
 
 #pragma region WindowsConsole
-	HANDLE& HConsole()
+	HANDLE &HConsole()
 	{
 		static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -86,10 +85,9 @@ namespace Kek
 
 		return hConsole;
 	}
-	Byte& WindowsColorTable(int index)
+	Byte &WindowsColorTable(int index)
 	{
-		static Byte windowsColorTable[]
-		{
+		static Byte windowsColorTable[]{
 			Byte(0b00001111),
 			Byte(0b00000000),
 			Byte(0b00000001),
@@ -110,23 +108,23 @@ namespace Kek
 
 		return windowsColorTable[index];
 	}
-	void SetWindowsConsoleColor(const colRGB8i& font, const colRGB8i& background)
+	void SetWindowsConsoleColor(const colRGB8i &font, const colRGB8i &background)
 	{
 		int fontIndex = 0;
 		int backIndex = 0;
 
 		float fontMinV = Color::Similarity(IConsole::colorTable[0], font);
 		float backMinV = Color::Similarity(IConsole::colorTable[0], background);
-		for(int i = 1; i < 16; i++)
+		for (int i = 1; i < 16; i++)
 		{
 			float fontV = Color::Similarity(IConsole::colorTable[i], font);
 			float backV = Color::Similarity(IConsole::colorTable[i], background);
-			if(fontV < fontMinV)
+			if (fontV < fontMinV)
 			{
 				fontMinV = fontV;
 				fontIndex = i;
 			}
-			if(backV < backMinV)
+			if (backV < backMinV)
 			{
 				backMinV = backV;
 				backIndex = i;
@@ -137,16 +135,29 @@ namespace Kek
 		SetConsoleTextAttribute(HConsole(), backColorByte | fontColorByte);
 	}
 
+	void WindowsConsole::ShowCursor(bool show)
+	{
+		CONSOLE_CURSOR_INFO cursorInfo;
+
+		GetConsoleCursorInfo(HConsole, &cursorInfo);
+		cursorInfo.bVisible = show;
+		SetConsoleCursorInfo(HConsole, &cursorInfo);
+	}
+	void WindowsConsole::SetCursorPosition(vec2i pos)
+	{
+		SetConsoleCursorPosition(HConsole(), COORD{(short)pos.x, (short)pos.y});
+	}
+
 	void WindowsConsole::SetIndention(int indention)
 	{
 		indentionLevel = Maths::Clamp(indention, 0, 255);
 	}
-	void WindowsConsole::SetColor(const colRGB8i& col)
+	void WindowsConsole::SetColor(const colRGB8i &col)
 	{
 		fontCol = col;
 		SetWindowsConsoleColor(fontCol, backCol);
 	}
-	void WindowsConsole::SetBackColor(const colRGB8i& col)
+	void WindowsConsole::SetBackColor(const colRGB8i &col)
 	{
 		backCol = col;
 		SetWindowsConsoleColor(fontCol, backCol);
@@ -154,14 +165,18 @@ namespace Kek
 	void WindowsConsole::SetBold(bool state)
 	{
 		isBold = state;
-		if(state)std::cout << "\033[1m";
-		else std::cout << "\033[2m";
+		if (state)
+			std::cout << "\033[1m";
+		else
+			std::cout << "\033[2m";
 	}
 	void WindowsConsole::SetUnderline(bool state)
 	{
 		isUnderline = state;
-		if(state)std::cout << "\033[4m";
-		else std::cout << "\033[24m";
+		if (state)
+			std::cout << "\033[4m";
+		else
+			std::cout << "\033[24m";
 	}
 	void WindowsConsole::SetDefault()
 	{
@@ -173,6 +188,18 @@ namespace Kek
 		std::cout << "\033[0m";
 	}
 
+	vec2i WindowsConsole::GetCursorPosition()
+	{
+		CONSOLE_SCREEN_BUFFER_INFO cbsi;
+		if (GetConsoleScreenBufferInfo(HConsole(), &cbsi))
+		{
+			return {cbsi.dwCursorPosition.X, cbsi.dwCursorPosition.Y};
+		}
+		else
+		{
+			return vec2i(-1, -1);
+		}
+	}
 	int WindowsConsole::GetIndention()
 	{
 		return indentionLevel;
@@ -198,26 +225,31 @@ namespace Kek
 	{
 		return lastLoggedChar;
 	}
-	std::ostream& WindowsConsole::operator<<(std::string_view sv)
+	std::ostream &WindowsConsole::operator<<(std::string_view sv)
 	{
-		if(sv.size() == 0) return std::cout;
-
+		if (sv.size() == 0)
+			return std::cout;
 
 		size_t pos = sv.find('\n');
-		if(pos == -1) pos = sv.size() - 1;
+		if (pos == -1)
+			pos = sv.size() - 1;
 		pos++;
 
 		std::string_view subSV(sv.begin(), sv.begin() + pos);
-		if(GetLastLoggedChar() == '\n') std::cout << std::string(GetIndention(), ' ') << subSV;
-		else std::cout << subSV;
+		if (GetLastLoggedChar() == '\n')
+			std::cout << std::string(GetIndention(), ' ') << subSV;
+		else
+			std::cout << subSV;
 		lastLoggedChar = subSV[subSV.size() - 1];
 
 		return WindowsConsole::operator<<(std::string_view(sv.begin() + pos, sv.end()));
 	}
-	std::ostream& WindowsConsole::operator<<(char sv)
+	std::ostream &WindowsConsole::operator<<(char sv)
 	{
-		if(GetLastLoggedChar() == '\n')std::cout << std::string(GetIndention(), ' ') << sv;
-		else std::cout << sv;
+		if (GetLastLoggedChar() == '\n')
+			std::cout << std::string(GetIndention(), ' ') << sv;
+		else
+			std::cout << sv;
 		lastLoggedChar = sv;
 		return std::cout;
 	}
@@ -225,19 +257,25 @@ namespace Kek
 
 #pragma region FileConsole
 
-	FileConsole::FileConsole(const char* sv)
+	FileConsole::FileConsole(const char *sv)
 	{
 		ofstream.open(sv);
 	}
 
+	void FileConsole::ShowCursor(bool show)
+	{
+	}
+	void FileConsole::SetCursorPosition(vec2i pos)
+	{
+	}
 	void FileConsole::SetIndention(int indention)
 	{
 		indentionLevel = Maths::Clamp(indention, 0, 255);
 	}
-	void FileConsole::SetColor(const colRGB8i& col)
+	void FileConsole::SetColor(const colRGB8i &col)
 	{
 	}
-	void FileConsole::SetBackColor(const colRGB8i& col)
+	void FileConsole::SetBackColor(const colRGB8i &col)
 	{
 	}
 	void FileConsole::SetBold(bool state)
@@ -250,6 +288,10 @@ namespace Kek
 	{
 	}
 
+	vec2i FileConsole::GetCursorPosition()
+	{
+		return vec2i();
+	}
 	int FileConsole::GetIndention() { return indentionLevel; }
 	colRGB8i FileConsole::GetColor()
 	{
@@ -269,25 +311,31 @@ namespace Kek
 	}
 
 	char FileConsole::GetLastLoggedChar() { return lastLoggedChar; }
-	std::ostream& FileConsole::operator<<(std::string_view sv)
+	std::ostream &FileConsole::operator<<(std::string_view sv)
 	{
-		if(sv.size() == 0) return ofstream;
+		if (sv.size() == 0)
+			return ofstream;
 
 		size_t pos = sv.find('\n');
-		if(pos == -1) pos = sv.size() - 1;
+		if (pos == -1)
+			pos = sv.size() - 1;
 		pos++;
 
 		std::string_view subSV(sv.begin(), sv.begin() + pos);
-		if(GetLastLoggedChar() == '\n') ofstream << std::string(GetIndention(), ' ') << subSV;
-		else ofstream << subSV;
+		if (GetLastLoggedChar() == '\n')
+			ofstream << std::string(GetIndention(), ' ') << subSV;
+		else
+			ofstream << subSV;
 		lastLoggedChar = subSV[subSV.size() - 1];
 
 		return FileConsole::operator<<(std::string_view(sv.begin() + pos, sv.end()));
 	}
-	std::ostream& FileConsole::operator<<(char sv)
+	std::ostream &FileConsole::operator<<(char sv)
 	{
-		if(GetLastLoggedChar() == '\n') ofstream << std::string(GetIndention(), ' ') << sv;
-		else ofstream << sv;
+		if (GetLastLoggedChar() == '\n')
+			ofstream << std::string(GetIndention(), ' ') << sv;
+		else
+			ofstream << sv;
 		lastLoggedChar = sv;
 		return ofstream;
 	}

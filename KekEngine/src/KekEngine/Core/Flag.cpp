@@ -1,6 +1,5 @@
 #include "Flag.h"
 #include <iostream>
-
 namespace Kek
 {
 	void FlagSet::SetUp(char flags)
@@ -17,7 +16,7 @@ namespace Kek
 	}
 	bool FlagSet::IsDown(char bits) const
 	{
-		return (~value & bits) == bits;
+		return (value & bits) == 0; 
 	}
 
 	FlagSet::FlagSet(char value) : value(value)

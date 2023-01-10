@@ -7,36 +7,38 @@ namespace Kek
 {
 	class ColorTable
 	{
-		public:
-		static bool isValidName(const std::string& str);
-		colRGB8i operator[](const std::string& str);
+	public:
+		static bool isValidName(const std::string &str);
+		colRGB8i operator[](const std::string &str);
 		colRGB8i operator[](int ind);
 	};
 
 	class IConsole
 	{
-		public:
-
+	public:
 		static ColorTable colorTable;
 
 		/// <summary>
-		///White, Black, Blue, Green, Cyan, Red, Magenta, Yellow, Gray, LGray, LBlue, LGreen, LCyan, LRed, LMagenta, LYellow
+		/// White, Black, Blue, Green, Cyan, Red, Magenta, Yellow, Gray, LGray, LBlue, LGreen, LCyan, LRed, LMagenta, LYellow
 		/// </summary>
 		/// <param name="colorName"></param>
-		void SetColor(const std::string& colorName);
+		void SetColor(const std::string &colorName);
 		/// <summary>
-		///White, Black, Blue, Green, Cyan, Red, Magenta, Yellow, Gray, LGray, LBlue, LGreen, LCyan, LRed, LMagenta, LYellow
+		/// White, Black, Blue, Green, Cyan, Red, Magenta, Yellow, Gray, LGray, LBlue, LGreen, LCyan, LRed, LMagenta, LYellow
 		/// </summary>
 		/// <param name="colorName"></param>
-		void SetBackColor(const std::string& colorName);
+		void SetBackColor(const std::string &colorName);
 
+		virtual void ShowCursor(bool show) = 0;
+		virtual void SetCursorPosition(vec2i pos) = 0;
 		virtual void SetIndention(int indention) = 0;
-		virtual void SetColor(const colRGB8i& col) = 0;
-		virtual void SetBackColor(const colRGB8i& col) = 0;
+		virtual void SetColor(const colRGB8i &col) = 0;
+		virtual void SetBackColor(const colRGB8i &col) = 0;
 		virtual void SetBold(bool state) = 0;
 		virtual void SetUnderline(bool state) = 0;
 		virtual void SetDefault() = 0;
 
+		virtual vec2i GetCursorPosition() = 0;
 		virtual int GetIndention() = 0;
 		virtual colRGB8i GetColor() = 0;
 		virtual colRGB8i GetBackColor() = 0;
@@ -44,8 +46,8 @@ namespace Kek
 		virtual bool GetUnderline() = 0;
 
 		virtual char GetLastLoggedChar() = 0;
-		virtual std::ostream& operator << (std::string_view sv) = 0;
-		virtual std::ostream& operator << (char sv) = 0;
+		virtual std::ostream &operator<<(std::string_view sv) = 0;
+		virtual std::ostream &operator<<(char sv) = 0;
 	};
 
 	class WindowsConsole : public IConsole
@@ -57,16 +59,19 @@ namespace Kek
 		unsigned char indentionLevel = 0;
 		char lastLoggedChar = '\n';
 
-		public:
+	public:
 		WindowsConsole() {}
 
+		void ShowCursor(bool show);
+		void SetCursorPosition(vec2i pos);
 		void SetIndention(int indention);
-		void SetColor(const colRGB8i& col);
-		void SetBackColor(const colRGB8i& col);
+		void SetColor(const colRGB8i &col);
+		void SetBackColor(const colRGB8i &col);
 		void SetBold(bool state);
 		void SetUnderline(bool state);
 		void SetDefault();
 
+		vec2i GetCursorPosition();
 		int GetIndention();
 		colRGB8i GetColor();
 		colRGB8i GetBackColor();
@@ -74,8 +79,8 @@ namespace Kek
 		bool GetUnderline();
 
 		char GetLastLoggedChar();
-		std::ostream& operator << (std::string_view sv);
-		std::ostream& operator << (char sv);
+		std::ostream &operator<<(std::string_view sv);
+		std::ostream &operator<<(char sv);
 	};
 	class FileConsole : public IConsole
 	{
@@ -83,16 +88,19 @@ namespace Kek
 		unsigned char indentionLevel = 0;
 		char lastLoggedChar = '\n';
 
-		public:
-		FileConsole(const char* sv);
+	public:
+		FileConsole(const char *sv);
 
+		void ShowCursor(bool show);
+		void SetCursorPosition(vec2i pos);
 		void SetIndention(int indention);
-		void SetColor(const colRGB8i& col);
-		void SetBackColor(const colRGB8i& col);
+		void SetColor(const colRGB8i &col);
+		void SetBackColor(const colRGB8i &col);
 		void SetBold(bool state);
 		void SetUnderline(bool state);
 		void SetDefault();
 
+		vec2i GetCursorPosition();
 		int GetIndention();
 		colRGB8i GetColor();
 		colRGB8i GetBackColor();
@@ -100,7 +108,7 @@ namespace Kek
 		bool GetUnderline();
 
 		char GetLastLoggedChar();
-		std::ostream& operator << (std::string_view sv);
-		std::ostream& operator << (char sv);
+		std::ostream &operator<<(std::string_view sv);
+		std::ostream &operator<<(char sv);
 	};
 }
