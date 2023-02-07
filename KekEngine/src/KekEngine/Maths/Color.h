@@ -129,92 +129,108 @@ namespace Kek
 			return *this;
 		}
 
-		void operator+=(const T &v)
+		template <typename TO>
+		void operator+=(const TO &v)
 		{
 			for (T &val : this->value)
 				val += v;
 		}
-		void operator-=(const T &v)
+		template <typename TO>
+		void operator-=(const TO &v)
 		{
 			for (T &val : this->value)
 				val -= v;
 		}
-		void operator*=(const T &v)
+		template <typename TO>
+		void operator*=(const TO &v)
 		{
 			for (T &val : this->value)
 				val *= v;
 		}
-		void operator/=(const T &v)
+		template <typename TO>
+		void operator/=(const TO &v)
 		{
 			for (T &val : this->value)
 				val /= v;
 		}
 
-		void operator+=(const col<TSize, T> &v)
+		template <typename TO>
+		void operator+=(const col<TSize, TO> &v)
 		{
 			for (int i = 0; i < TSize; i++)
 				operator[](i) += v[i];
 		}
-		void operator-=(const col<TSize, T> &v)
+		template <typename TO>
+		void operator-=(const col<TSize, TO> &v)
 		{
 			for (int i = 0; i < TSize; i++)
 				operator[](i) -= v[i];
 		}
-		void operator*=(const col<TSize, T> &v)
+		template <typename TO>
+		void operator*=(const col<TSize, TO> &v)
 		{
 			for (int i = 0; i < TSize; i++)
 				operator[](i) *= v[i];
 		}
-		void operator/=(const col<TSize, T> &v)
+		template <typename TO>
+		void operator/=(const col<TSize, TO> &v)
 		{
 			for (int i = 0; i < TSize; i++)
 				operator[](i) /= v[i];
 		}
 
-		col<TSize, T> operator+(const T &v) const
+		template <typename TO>
+		col<TSize, T> operator+(const TO &v) const
 		{
 			col<TSize, T> col(*this);
 			col += v;
 			return col;
 		}
-		col<TSize, T> operator-(const T &v) const
+		template <typename TO>
+		col<TSize, T> operator-(const TO &v) const
 		{
 			col<TSize, T> col(*this);
 			col -= v;
 			return col;
 		}
-		col<TSize, T> operator*(const T &v) const
+		template <typename TO>
+		col<TSize, T> operator*(const TO &v) const
 		{
 			col<TSize, T> col(*this);
 			col *= v;
 			return col;
 		}
-		col<TSize, T> operator/(const T &v) const
+		template <typename TO>
+		col<TSize, T> operator/(const TO &v) const
 		{
 			col<TSize, T> col(*this);
 			col /= v;
 			return col;
 		}
 
-		col<TSize, T> operator+(const col<TSize, T> &v) const
+		template <typename TO>
+		col<TSize, T> operator+(const col<TSize, TO> &v) const
 		{
 			col<TSize, T> col(*this);
 			col += v;
 			return col;
 		}
-		col<TSize, T> operator-(const col<TSize, T> &v) const
+		template <typename TO>
+		col<TSize, T> operator-(const col<TSize, TO> &v) const
 		{
 			col<TSize, T> col(*this);
 			col -= v;
 			return col;
 		}
-		col<TSize, T> operator*(const col<TSize, T> &v) const
+		template <typename TO>
+		col<TSize, T> operator*(const col<TSize, TO> &v) const
 		{
 			col<TSize, T> col(*this);
 			col *= v;
 			return col;
 		}
-		col<TSize, T> operator/(const col<TSize, T> &v) const
+		template <typename TO>
+		col<TSize, T> operator/(const col<TSize, TO> &v) const
 		{
 			col<TSize, T> col(*this);
 			col /= v;

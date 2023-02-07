@@ -1,49 +1,54 @@
 #include "Application.h"
 #include "Context.h"
 #include "GLFW/glfw3.h"
-#pragma comment(linker, "/ENTRY:mainCRTStartup")
 using namespace Kek;
 
 int main()
 {
 	Setup();
+
 	while (!Application::IsQuitting())
 	{
 		glfwPollEvents();
 
 		Update();
-		Application::FrameEndEvent()();
 
+		Application::OnFrameEnd()();
+
+		// Delete marked windows.
 		for (int i = Application::WindowCount() - 1; i >= 0; i--)
+		{
 			if (Application::GetWindow(i).Closed())
+			{
+				Application::GetWindow(i).Destroy();
 				Application::DeleteWindow(i);
+			}
+		}
 	}
-	for (int i = Application::WindowCount() - 1; i >= 0; i--)
-	{
-		Application::DeleteWindow(i);
-	}
-	SystemContext::Terminate();
 
 	return 0;
 }
 
 namespace Kek
 {
-	Window **Application::windowArray = NULL;
-	int Application::windowCount = 0;
+	std::vector<Window*> Application::windowArray;
 	bool Application::shouldQuit = false;
-
-	Application::Application(const Window &window)
+	Application::Init::Init()
 	{
 		SystemContext::Initialize();
-		AddWindow(window);
 	}
 	Application::Application()
 	{
 		SystemContext::Initialize();
 	}
+	Application::Application(const Window &window, Init init)
+	{
+		AddWindow(window);
+		GraphicsContext::Initialize();
+	}
+	
 
-	Event<> &Application::FrameEndEvent()
+	Event<> &Application::OnFrameEnd()
 	{
 		static Event<> event;
 		return event;
@@ -67,17 +72,17 @@ namespace Kek
 		return shouldQuit;
 	}
 
-	int Application::WindowCount() { return windowCount; }
+	unsigned int Application::WindowCount() { return windowArray.size(); }
 
+	void OnWindowCloseListener(Window* window) { Application::DeleteWindow(window); window->Destroy(); }
 	void Application::AddWindow(Window *_window)
 	{
-		Realloc(windowCount + 1);
-		windowArray[windowCount - 1] = _window;
+		_window->OnClose += OnWindowCloseListener;
+		windowArray.push_back(_window);
 	}
 	void Application::AddWindow(const Window &_window)
 	{
-		Realloc(windowCount + 1);
-		windowArray[windowCount - 1] = new Window(_window);
+		AddWindow(new Window(_window));
 	}
 	Window &Application::GetWindow(int index)
 	{
@@ -85,25 +90,20 @@ namespace Kek
 	}
 	void Application::DeleteWindow(int index)
 	{
-		windowArray[index]->Destroy();
-		delete windowArray[index];
+		windowArray.erase(windowArray.begin() + index);
 
-		for (int i = index; i < windowCount - 1; i++)
-		{
-			windowArray[i] = windowArray[i + 1];
-		}
-		Realloc(windowCount - 1);
+		if (WindowCount() == 0)
+			Quit();
 	}
-
-	void Application::Realloc(int size)
+	void Application::DeleteWindow(Window* _window)
 	{
-		if (windowCount == size)
-			return;
-		windowCount = size;
-		void *ptr = realloc(windowArray, size * sizeof(Window *));
-		if (ptr != NULL)
+		for (int i = 0; i < WindowCount(); i++)
 		{
-			windowArray = (Window **)ptr;
+			if (windowArray[i] == _window)
+			{
+				DeleteWindow(i);
+				return;
+			}
 		}
 	}
 }

@@ -5,9 +5,10 @@ const char *vertexShaderSource =
 layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec3 aCol;
 out vec3 col;
+uniform vec2 offset;
 void main()
 {
-    gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);
+    gl_Position = vec4(aPos.x + offset.x, aPos.y - offset.y, 0.0, 1.0);
     col = aCol;
 })";
 

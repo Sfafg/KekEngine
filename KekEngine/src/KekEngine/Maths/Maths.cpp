@@ -41,10 +41,15 @@ namespace Kek
 	{
 		return round(a);
 	}
+	float Maths::Pow(float a, float b)
+	{
+		return pow(a, b);
+	}
 	float Maths::Sqrt(float a)
 	{
 		return sqrt(a);
 	}
+
 	std::default_random_engine generator;
 	float Maths::NormalDist(float mean, float standardDeviation)
 	{

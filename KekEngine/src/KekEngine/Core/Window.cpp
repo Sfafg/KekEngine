@@ -2,36 +2,26 @@
 #include "GLFW/glfw3.h"
 #include "KekEngine/Core/Log.h"
 #include "KekEngine/Maths/Byte.h"
-#include "Context.h"
+#include "GLFW_Keys.h"
 
 namespace Kek
 {
-	Window::Window(const char *title, FlagSet style, vec2i size, vec2i pos, Monitor monitor)
-		: name(title),
-		  OnMouseMove(),
-		  OnMove(),
-		  OnMouseEnter(),
-		  OnResize(),
-		  OnClose(),
-		  OnMaximize(),
-		  OnFocus()
+	Window::Window() : name(nullptr), window(nullptr) {}
+	Window::Window(const char *title, vec2i size, FlagSet style, Monitor monitor) : name(title)
 	{
+		glfwDefaultWindowHints();
 
-		SystemContext::Initialize();
-		if (style.IsUp(WindowStyle::Fullscreen))
+		if (style.IsUp(Fullscreen))
 		{
-			if (monitor == NULL)
-				monitor = Monitor(0);
+			if (monitor == nullptr)
+			{
+				monitor = Monitors::Primary();
+			}
 			size = monitor.Size();
-			pos = vec2i(0, 0);
 		}
-		if (style.IsUp(WindowStyle::Borderless))
-		{
-			glfwWindowHint(GLFW_DECORATED, style.IsUp(WindowStyle::Borderless));
-			monitor = Monitor();
-		}
-		glfwWindowHint(GLFW_FLOATING, style.IsUp(WindowStyle::Floating));
-		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, style.IsUp(WindowStyle::Transparent));
+		glfwWindowHint(GLFW_DECORATED, style.IsDown(Borderless));
+		glfwWindowHint(GLFW_FLOATING, style.IsUp(Floating));
+		glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, style.IsUp(Transparent));
 
 		window = glfwCreateWindow(size.x, size.y, title, (GLFWmonitor *)(void *)monitor, NULL);
 		if (window == NULL)
@@ -40,16 +30,14 @@ namespace Kek
 			return;
 		}
 		ContextCurrent();
-		glfwSwapInterval(0);
-		GraphicsContext::Initialize();
 
-		if (pos.x >= 0)
-			glfwSetWindowPos((GLFWwindow *)window, pos.x, pos.y);
 		glfwSetWindowUserPointer((GLFWwindow *)window, (void *)this);
 		glfwSetFramebufferSizeCallback(
 			(GLFWwindow *)window,
 			[](GLFWwindow *window, int w, int h)
 			{
+				glViewport(0, 0, w, h);
+
 				Window *win = (Window *)glfwGetWindowUserPointer(window);
 				win->OnResize(vec2i(w, h), win);
 			});
@@ -109,40 +97,11 @@ namespace Kek
 				Window *win = (Window *)glfwGetWindowUserPointer(window);
 				win->OnKey(GLFWToKey(button), GLFWToKey(button), GLFWToState(action), mods, win);
 			});
-		glfwSetFramebufferSizeCallback(
-			(GLFWwindow *)window,
-			[](GLFWwindow *window, int width, int height)
-			{
-				glViewport(0, 0, width, height);
-			});
 	}
-	Window::Window(const char *title, FlagSet style, vec2f size, vec2f pos, Monitor monitor)
-		: Window(title, style, vec2i(size * Monitor(0).Size()), vec2i(pos * Monitor(0).Size()), monitor)
-	{
-	}
-	Window::Window(const char *title, vec2i size, vec2i pos, Monitor monitor)
-		: Window(title, 0, size, pos, monitor)
-	{
-	}
-	Window::Window(const char *title, vec2f size, vec2f pos, Monitor monitor)
-		: Window(title, 0, vec2i(size * Monitor(0).Size()), vec2i(pos * Monitor(0).Size()), monitor)
-	{
-	}
-	Window::Window(const char *title, FlagSet style, Monitor monitor)
-		: Window(title, style, monitor.Size())
-	{
-	}
+	Window::Window(const char *title, vec2f size, FlagSet style, Monitor monitor) : Window(title, vec2i(size * monitor.Size()), style, monitor) {}
+	Window::Window(const char *title, FlagSet style, Monitor monitor) : Window(title, vec2i(0, 0), style, monitor) {}
 
-	Window::Window(const Window &o)
-		: name(o.name),
-		  window(o.window),
-		  OnMouseMove(o.OnMouseMove),
-		  OnMove(o.OnMove),
-		  OnMouseEnter(o.OnMouseEnter),
-		  OnResize(o.OnResize),
-		  OnClose(o.OnClose),
-		  OnMaximize(o.OnMaximize),
-		  OnFocus(o.OnFocus)
+	Window::Window(const Window &o) : name(o.name), window(o.window), OnMouseMove(o.OnMouseMove), OnMove(o.OnMove), OnMouseEnter(o.OnMouseEnter), OnResize(o.OnResize), OnClose(o.OnClose), OnMaximize(o.OnMaximize), OnFocus(o.OnFocus)
 	{
 		glfwSetWindowUserPointer((GLFWwindow *)window, (void *)this);
 	}
@@ -196,7 +155,14 @@ namespace Kek
 	{
 		glfwSetWindowSize((GLFWwindow *)window, size.x, size.y);
 	}
-
+	float Window::Opacity()
+	{
+		return glfwGetWindowOpacity((GLFWwindow*)window);
+	}
+	void Window::SetOpacity(float opacity)
+	{
+		glfwSetWindowOpacity((GLFWwindow*)window, opacity);
+	}
 	vec2f Window::MousePosition() const
 	{
 		double x, y;
@@ -242,10 +208,6 @@ namespace Kek
 	void Window::SwapBuffers()
 	{
 		glfwSwapBuffers((GLFWwindow *)window);
-	}
-	void Window::SetAttribute(int attrib, int value)
-	{
-		glfwSetWindowAttrib((GLFWwindow *)window, attrib, value);
 	}
 	void Window::ContextCurrent()
 	{

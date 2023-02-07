@@ -5,81 +5,113 @@ namespace Kek
 {
 	namespace Graphics
 	{
-		uint CreateShader(uint type, const char *src)
+		namespace SHADER
 		{
-			uint id = glCreateShader(type);
-			glShaderSource(id, 1, &src, nullptr);
+			uint VERTEX = GL_VERTEX_SHADER;
+			uint GEOMETRY = GL_GEOMETRY_SHADER;
+			uint FRAGMENT = GL_FRAGMENT_SHADER;
+			uint COMPUTE = GL_COMPUTE_SHADER;
+		};
 
-			return id;
-		}
-
-		bool CompileShader(uint id, char *&compilationLog)
+		class ShaderSource
 		{
-			glCompileShader(id);
-			uint infoLength;
-			glGetShaderiv(id, GL_INFO_LOG_LENGTH, (GLint *)&infoLength);
-			if (infoLength != 0)
+			uint id;
+
+			friend class Shader;
+
+		public:
+			ShaderSource(const char *source, uint sourceEnumu, uint shaderType) : id(glCreateShader(shaderType))
 			{
-				compilationLog = new char[infoLength];
-				glGetShaderInfoLog(id, infoLength, nullptr, compilationLog);
+				glShaderSource(id, 1, &source, NULL);
+			}
+
+			bool Compile(std::string *compilationLog = nullptr)
+			{
+				glCompileShader(id);
+
+				int logLength = 0;
+				glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logLength);
+				if (logLength == 0 || compilationLog == nullptr)
+				{
+					return logLength == 0;
+				}
+
+				compilationLog->resize(logLength);
+				glGetShaderInfoLog(id, logLength, NULL, compilationLog->data());
 
 				return false;
 			}
-			return true;
-		}
-		void AttachShader(uint programID, uint shaderID)
-		{
-			glAttachShader(programID, shaderID);
-		}
-		void DeleteShader(uint id)
-		{
-			glDeleteShader(id);
-		}
+			~ShaderSource()
+			{
+				glDeleteShader(id);
+			}
+		};
 
 		Shader::Shader()
 		{
 			id = glCreateProgram();
 		}
-		Shader::Shader(const char *vertexShader, const char *fragmentShader) : Shader()
+		Shader::Shader(std::initializer_list<SourceData> sourceData) : Shader()
 		{
-			uint vertexID = CreateShader(GL_VERTEX_SHADER, vertexShader);
-			uint fragmentID = CreateShader(GL_FRAGMENT_SHADER, fragmentShader);
+			for (int i = 0; i < sourceData.size(); i++)
+			{
+				const SourceData &data = sourceData.begin()[i];
+				ShaderSource source(data.source, data.sourceEnum, data.type);
 
-			char *compilationLog = nullptr;
-			if (!CompileShader(vertexID, compilationLog))
-			{
-				Log<ERROR>("Failed To Compile VERTEX SHADER.");
-				Log<ERROR>(compilationLog);
-				delete[] compilationLog;
-			}
-			if (!CompileShader(fragmentID, compilationLog))
-			{
-				Log<ERROR>("Failed To Compile FRAGMENT SHADER.");
-				Log<ERROR>(compilationLog);
-				delete[] compilationLog;
+				std::string log;
+				if (!source.Compile(&log))
+				{
+					Log<ERROR>("Failed To Compile Shader.\n", log);
+				}
+
+				glAttachShader(id, source.id);
 			}
 
-			AttachShader(id, vertexID);
-			AttachShader(id, fragmentID);
-			glLinkProgram(id);
-
-			uint length;
-			glGetProgramiv(id, GL_INFO_LOG_LENGTH, (GLint *)&length);
-
-			compilationLog = new char[length];
-			if (length != 0)
+			std::string log;
+			if (!Link(&log))
 			{
-				glGetShaderInfoLog(id, length, NULL, compilationLog);
-				Log<ERROR>("Failed to Link Program:\n");
-				Log<ERROR>(compilationLog);
-				delete[] compilationLog;
-			};
-
-			DeleteShader(vertexID);
-			DeleteShader(fragmentID);
-
+				Log<ERROR>("Failed To Link Shader.\n", log);
+			}
 			Bind();
 		}
+		bool Shader::Link(std::string *linkingLog)
+		{
+			glLinkProgram(id);
+
+			int logLength = 0;
+			glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logLength);
+			if (logLength == 0 || linkingLog == nullptr)
+			{
+				return logLength == 0;
+			}
+
+			linkingLog->resize(logLength);
+			glGetShaderInfoLog(id, logLength, NULL, linkingLog->data());
+
+			Bind();
+			return false;
+		}
+
+		int Shader::GetUniformLocation(const char *name)
+		{
+			return glGetUniformLocation(id, name);
+		}
+
+		void Shader::SetUniform(int location, const float *value, uint count) { glUniform1fv(location, count, value); }
+		void Shader::SetUniform(int location, const int *value, uint count) { glUniform1iv(location, count, value); }
+		void Shader::SetUniform(int location, const unsigned int *value, uint count) { glUniform1uiv(location, count, value); }
+		void Shader::SetUniform(int location, const vec<2, float> *value, uint count) { glUniform2fv(location, count, (float *)value); }
+		void Shader::SetUniform(int location, const vec<3, float> *value, uint count) { glUniform3fv(location, count, (float *)value); }
+		void Shader::SetUniform(int location, const vec<4, float> *value, uint count) { glUniform4fv(location, count, (float *)value); }
+		void Shader::SetUniform(int location, const vec<2, int> *value, uint count) { glUniform2iv(location, count, (int *)value); }
+		void Shader::SetUniform(int location, const vec<3, int> *value, uint count) { glUniform3iv(location, count, (int *)value); }
+		void Shader::SetUniform(int location, const vec<4, int> *value, uint count) { glUniform4iv(location, count, (int *)value); }
+		void Shader::SetUniform(int location, const vec<2, uint> *value, uint count) { glUniform2uiv(location, count, (uint *)value); }
+		void Shader::SetUniform(int location, const vec<3, uint> *value, uint count) { glUniform3uiv(location, count, (uint *)value); }
+		void Shader::SetUniform(int location, const vec<4, uint> *value, uint count) { glUniform4uiv(location, count, (uint *)value); }
+		void Shader::SetUniform(int location, const mat<2, 2, float> *value, uint count) { glUniformMatrix2fv(location, count, false, (float *)value); }
+		void Shader::SetUniform(int location, const mat<3, 3, float> *value, uint count) { glUniformMatrix3fv(location, count, false, (float *)value); }
+		void Shader::SetUniform(int location, const mat<4, 4, float> *value, uint count) { glUniformMatrix4fv(location, count, false, (float *)value); }
 
 		void Shader::Bind()
 		{
@@ -89,5 +121,5 @@ namespace Kek
 		{
 			glDeleteProgram(id);
 		}
-	}
-}
+	};
+};

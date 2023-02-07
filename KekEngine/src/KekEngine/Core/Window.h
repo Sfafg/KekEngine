@@ -1,59 +1,48 @@
 #pragma once
 #include "KekEngine/Maths/Vector.h"
-#include "KekEngine/Core/Events.h"
-#include "KekEngine/Core/Monitor.h"
-#include "KekEngine/Core/Flag.h"
+#include "Events.h"
+#include "Monitor.h"
+#include "Flag.h"
 #include "Keys.h"
-#include "GLFW_Keys.h"
 
 namespace Kek
 {
-	struct WindowStyle
+	enum WindowStyle
 	{
-		const static char
-			None = 0,
-			Fullscreen = 1,
-			Borderless = 2,
-			Floating = 4,
-			Transparent = 8,
-			WindowedFullscreen = Fullscreen | Borderless,
-			FloatingBorderless = Floating | Borderless;
+		None = 0,
+		Fullscreen = 1,
+		Borderless = 2,
+		Floating = 4,
+		Transparent = 8,
+		Nonresizable = 16,
+		Windowed_Fullscreen = Fullscreen | Borderless,
+		Floating_Borderless = Floating | Borderless
 	};
-
 	class Window
 	{
-		void* window;
-		const char* name;
-		public:
+		void *window;
+		const char *name;
 
-		Window(const char* title, FlagSet style, Monitor monitor = Monitor());
-		Window(const char* title, FlagSet style, vec2i size, vec2i pos = { -1,-1 }, Monitor monitor = Monitor());
-		Window(const char* title, FlagSet style, vec2f size, vec2f pos = { -1,-1 }, Monitor monitor = Monitor());
-		Window(const char* title, vec2i size, vec2i pos = { -1,-1 }, Monitor monitor = Monitor());
-		Window(const char* title, vec2f size, vec2f pos = { -1,-1 }, Monitor monitor = Monitor());
+	public:
+		Window();
+		Window(const char *title, vec2i size, FlagSet style = None, Monitor monitor = Monitor());
+		Window(const char *title, vec2f size, FlagSet style = None, Monitor monitor = Monitor());
+		Window(const char *title, FlagSet style = Fullscreen, Monitor monitor = Monitor());
 
-		Window(const Window& window);
-		void operator=(const Window& window);
+		Window(const Window &window);
+		void operator=(const Window &window);
 
-		operator void* ();
+		operator void *();
 
-		Event<vec2i, Window*> OnMouseMove;
-		Event<vec2i, Window*> OnMove;
-		Event<bool, Window*> OnMouseEnter;
-		Event<char, int, char, FlagSet, Window*> OnKey;
-
-		Event<vec2i, Window*> OnResize;
-		Event<Window*> OnClose;
-		Event<bool, Window*> OnMaximize;
-		Event<bool, Window*> OnFocus;
-
-		const char* Title() const;
-		void SetTitle(const char* title);
+		const char *Title() const;
+		void SetTitle(const char *title);
 
 		vec2i Position() const;
 		void SetPosition(vec2i pos);
 		vec2i Size() const;
 		void SetSize(vec2i size);
+		float Opacity();
+		void SetOpacity(float opacity);
 
 		vec2f MousePosition() const;
 		void SetMousePosition(vec2f mpos);
@@ -67,10 +56,19 @@ namespace Kek
 
 		void Clear(vec4f col);
 		void SwapBuffers();
-		void SetAttribute(int attrib, int value);
 		void ContextCurrent();
 		void Close();
 		bool Closed() const;
 		void Destroy();
+
+		Event<vec2i, Window *> OnMouseMove;
+		Event<vec2i, Window *> OnMove;
+		Event<bool, Window *> OnMouseEnter;
+		Event<char, int, char, FlagSet, Window *> OnKey;
+
+		Event<vec2i, Window *> OnResize;
+		Event<Window *> OnClose;
+		Event<bool, Window *> OnMaximize;
+		Event<bool, Window *> OnFocus;
 	};
 }

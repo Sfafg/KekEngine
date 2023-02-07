@@ -37,6 +37,7 @@ namespace Kek
 		float Tan(float a);
 		float Ceil(float a);
 		float Round(float a);
+		float Pow(float a, float b);
 		float Sqrt(float a);
 		float NormalDist(float mean, float standardDeviation);
 		float FastInverseRoot(float n);

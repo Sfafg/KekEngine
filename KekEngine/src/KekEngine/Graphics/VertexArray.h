@@ -1,14 +1,14 @@
 #pragma once
 #include <vector>
-#include "Buffers.h";
-#include "VertexLayout.h";
+#include "Buffers.h"
+#include "VertexLayout.h"
 
 namespace Kek
 {
     namespace Graphics
     {
         template <typename TVertex, typename TIndex = int>
-        class VertexArray1
+        class VertexArray
         {
             VertexLayout layout;
             Buffer vertexBuffer;
@@ -20,8 +20,8 @@ namespace Kek
         public:
             uint shape;
             uint usage;
-
-            VertexArray1(std::initializer_list<VertexLayout::Attribute> attrbList, uint shape = TRIANGLES, uint usage = STATIC_DRAW)
+            VertexArray(){}
+            VertexArray(std::initializer_list<VertexLayout::Attribute> attrbList, uint shape = TRIANGLES, uint usage = STATIC_DRAW)
                 : layout(), vertexBuffer(), indexBuffer(), vertexCount(0), indexCount(0), shape(shape), usage(usage)
             {
                 layout.SetAttributes(attrbList);

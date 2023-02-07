@@ -34,6 +34,7 @@ namespace Kek
 		}
 		void Terminate()
 		{
+			initialized = false;
 			glfwTerminate();
 			Log<INFO>("Terminated GLFW.");
 		}

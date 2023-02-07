@@ -21,6 +21,10 @@ namespace Kek
 			if(index >= size) return Monitor();
 			return arr[index];
 		}
+		Monitor Primary()
+		{
+			return Monitor(glfwGetPrimaryMonitor());
+		}
 	};
 
 	Monitor::Monitor(void* monitor) : monitor(monitor) {}

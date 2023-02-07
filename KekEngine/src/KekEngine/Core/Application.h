@@ -1,6 +1,6 @@
 #pragma once
 #include "Window.h"
-#include "Events.h"
+#include <vector>
 
 namespace Kek
 {
@@ -8,15 +8,19 @@ namespace Kek
 	void Update();
 	class Application
 	{
-		static Window **windowArray;
-		static int windowCount;
+		static std::vector<Window *> windowArray;
 		static bool shouldQuit;
 
-	public:
-		static Event<> &FrameEndEvent();
+		struct Init
+		{
+			Init();
+		};
 
-		Application(const Window &window);
+	public:
+		static Event<> &OnFrameEnd();
+
 		Application();
+		Application(const Window &window, Init init = Init());
 
 		const Window &operator[](unsigned int index) const;
 		Window &operator[](unsigned int index);
@@ -24,13 +28,11 @@ namespace Kek
 		static void Quit();
 		static bool IsQuitting();
 
-		static int WindowCount();
+		static unsigned int WindowCount();
 		static void AddWindow(const Window &window);
 		static void AddWindow(Window *_window);
 		static Window &GetWindow(int index);
 		static void DeleteWindow(int index);
-
-	private:
-		static void Realloc(int size);
+		static void DeleteWindow(Window* _window);
 	};
 }
