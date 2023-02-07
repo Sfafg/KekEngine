@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include "Maths.h"
+
+#define OPERATOR(operand)
+
 namespace Kek
 {
 	// Syntax trick to get x, y, z, w aliases for array values
@@ -62,162 +65,82 @@ namespace Kek
 			return mag;
 		}
 		float Length() const { return Maths::Sqrt(Mag()); }
-		vec<TSize, T> &Normalize()
-		{
-			float l = Length();
-			if (l != 0)
-				*this /= l;
-			return *this;
-		}
-		vec<TSize, T> &Round()
-		{
-			for (T &v : this->value)
-				v = Maths::Round(v);
-			return *this;
-		}
-		vec<TSize, T> &Ceil()
-		{
-			for (T &v : this->value)
-				v = Maths::Ceil(v);
-			return *this;
-		}
-		vec<TSize, T> &Abs()
-		{
-			for (T &v : this->value)
-				v = Maths::Abs(v);
-			return *this;
-		}
-		vec<TSize, T> &Sign()
-		{
-			for (T &v : this->value)
-				v = Maths::Sign(v);
-			return *this;
-		}
-		vec<TSize, T> &Clamp(vec<TSize, T> min, vec<TSize, T> max)
-		{
-			for (int i = 0; i < TSize; i++)
-				operator[](i) = Maths::Clamp(operator[](i), min[i], max[i]);
-			return *this;
-		}
-		vec<TSize, T> &Wrap(vec<TSize, T> min, vec<TSize, T> max)
-		{
-			for (int i = 0; i < TSize; i++)
-				operator[](i) = Maths::Wrap(operator[](i), min[i], max[i]);
-			return *this;
-		}
 
-		template <typename TO>
-		void operator+=(const TO &v)
-		{
-			for (T &val : this->value)
-				val += v;
-		}
+#define OPERATOR(operand)              \
+	template <typename TO>             \
+	void operator operand(const TO &v) \
+	{                                  \
+		for (T & val : this->value)    \
+			val operand v;             \
+	}
+		OPERATOR(+=)
+		OPERATOR(-=)
+		OPERATOR(*=)
+		OPERATOR(/=)
+#undef OPERATOR
 
-		template <typename TO>
-		void operator-=(const TO &v)
-		{
-			for (T &val : this->value)
-				val -= v;
-		}
+#define OPERATOR(operand)                          \
+	template <typename TO>                         \
+	void operator operand(const vec<TSize, TO> &v) \
+	{                                              \
+		for (int i = 0; i < TSize; i++)            \
+			operator[](i) operand v[i];            \
+	}
+		OPERATOR(+=)
+		OPERATOR(-=)
+		OPERATOR(*=)
+		OPERATOR(/=)
+#undef OPERATOR
 
-		template <typename TO>
-		void operator*=(const TO &v)
-		{
-			for (T &val : this->value)
-				val *= v;
-		}
+#define OPERATOR(operand)                                \
+	vec<TSize, T> operator operand(const T &other) const \
+	{                                                    \
+		vec<TSize, T> v;                                 \
+		for (int i = 0; i < TSize; i++)                  \
+		{                                                \
+			v[i] = operator[](i) operand other;          \
+		}                                                \
+		return v;                                        \
+	}
+		OPERATOR(+)
+		OPERATOR(-)
+		OPERATOR(*)
+		OPERATOR(/)
+#undef OPERATOR
 
-		template <typename TO>
-		void operator/=(const TO &v)
-		{
-			for (T &val : this->value)
-				val /= v;
-		}
+#define OPERATOR(operand)                                       \
+	template <typename TO>                                      \
+	vec<TSize, T> operator operand(const vec<TSize, TO> &other) \
+	{                                                           \
+		vec<TSize, T> v;                                        \
+		for (int i = 0; i < TSize; i++)                         \
+		{                                                       \
+			v[i] = operator[](i) operand other[i];              \
+		}                                                       \
+		return v;                                               \
+	}
+		OPERATOR(+)
+		OPERATOR(-)
+		OPERATOR(*)
+		OPERATOR(/)
+#undef OPERATOR
 
-		template <typename TO>
-		void operator+=(const vec<TSize, TO> &v)
-		{
-			for (int i = 0; i < TSize; i++)
-				operator[](i) += v[i];
-		}
-
-		template <typename TO>
-		void operator-=(const vec<TSize, TO> &v)
-		{
-			for (int i = 0; i < TSize; i++)
-				operator[](i) -= v[i];
-		}
-
-		template <typename TO>
-		void operator*=(const vec<TSize, TO> &v)
-		{
-			for (int i = 0; i < TSize; i++)
-				operator[](i) *= v[i];
-		}
-
-		template <typename TO>
-		void operator/=(const vec<TSize, TO> &v)
-		{
-			for (int i = 0; i < TSize; i++)
-				operator[](i) /= v[i];
-		}
-
-		vec<TSize, T> operator+(const T &v) const
-		{
-			vec<TSize, T> vec(*this);
-			vec += v;
-			return vec;
-		}
-
-		vec<TSize, T> operator-(const T &v) const
-		{
-			vec<TSize, T> vec(*this);
-			vec -= v;
-			return vec;
-		}
-
-		vec<TSize, T> operator*(const T &v) const
-		{
-			vec<TSize, T> vec(*this);
-			vec *= v;
-			return vec;
-		}
-
-		vec<TSize, T> operator/(const T &v) const
-		{
-			vec<TSize, T> vec(*this);
-			vec /= v;
-			return vec;
-		}
-
-		vec<TSize, T> operator+(const vec<TSize, T> &v) const
-		{
-			vec<TSize, T> vec(*this);
-			vec += v;
-			return vec;
-		}
-
-		vec<TSize, T> operator-(const vec<TSize, T> &v) const
-		{
-			vec<TSize, T> vec(*this);
-			vec -= v;
-			return vec;
-		}
-
-		template <typename TO>
-		vec<TSize, T> operator*(const vec<TSize, TO> &v) const
-		{
-			vec<TSize, T> vec(*this);
-			vec *= v;
-			return vec;
-		}
-
-		vec<TSize, T> operator/(const vec<TSize, T> &v) const
-		{
-			vec<TSize, T> vec(*this);
-			vec /= v;
-			return vec;
-		}
+#define OPERATOR(operand)                                             \
+	template <typename TO>                                            \
+	vec<TSize, T> operator operand(const vec<TSize, TO> &other) const \
+	{                                                                 \
+		vec<TSize, TO> v;                                             \
+		for (int i = 0; i < TSize; i++)                               \
+		{                                                             \
+			v[i] = operator[](i) operand other[i];                    \
+		}                                                             \
+		return v;                                                     \
+	}
+		OPERATOR(+)
+		OPERATOR(-)
+		OPERATOR(*)
+		OPERATOR(/)
+#undef OPERATOR
 
 		vec<TSize, T> operator-() const
 		{
@@ -231,13 +154,6 @@ namespace Kek
 		{
 			for (T &val : this->value)
 				if (val != v)
-					return false;
-			return true;
-		}
-		bool operator!=(const T &v) const
-		{
-			for (T &val : this->value)
-				if (val == v)
 					return false;
 			return true;
 		}
@@ -274,13 +190,6 @@ namespace Kek
 		{
 			for (int i = 0; i < TSize; i++)
 				if (operator[](i) != v[i])
-					return false;
-			return true;
-		}
-		bool operator!=(const vec<TSize, T> &v) const
-		{
-			for (int i = 0; i < TSize; i++)
-				if (operator[](i) == v[i])
 					return false;
 			return true;
 		}
@@ -357,55 +266,81 @@ namespace Kek
 
 		return os;
 	}
-	template <unsigned int TSize, typename TR, typename TA, typename TB>
-	vec<TSize, TR> operator/(const TA &v, vec<TSize, TB> vec)
-	{
-		vec.x = v / vec.x;
-		vec.y = v / vec.y;
-		return vec;
+
+#define OPERATOR(operand)                                                \
+	template <unsigned int TSize, typename TR, typename TA, typename TB> \
+	vec<TSize, TR> operator operand(const TA &a, vec<TSize, TB> b)       \
+	{                                                                    \
+		vec<TSize, TR> v;                                                \
+		for (int i = 0; i < TSize; i++)                                  \
+		{                                                                \
+			v[i] = a operand b[i];                                       \
+		}                                                                \
+		return vec;                                                      \
 	}
-	template <unsigned int TSize, typename TR, typename TA, typename TB>
-	vec<TSize, TR> operator*(const TA &v, vec<TSize, TB> vec)
-	{
-		vec.x = v * vec.x;
-		vec.y = v * vec.y;
-		return vec;
-	}
-	template <unsigned int TSize, typename TR, typename TA, typename TB>
-	vec<TSize, TR> operator-(const TA &v, vec<TSize, TB> vec)
-	{
-		vec.x = v - vec.x;
-		vec.y = v - vec.y;
-		return vec;
-	}
-	template <unsigned int TSize, typename TR, typename TA, typename TB>
-	vec<TSize, TR> operator+(const TA &v, vec<TSize, TB> vec)
-	{
-		vec.x = v + vec.x;
-		vec.y = v + vec.y;
-		return vec;
-	}
+	OPERATOR(+)
+	OPERATOR(-)
+	OPERATOR(*)
+	OPERATOR(/)
+#undef OPERATOR
+
 	namespace Vector
 	{
 		template <unsigned int TSize, typename T>
 		vec<TSize, T> Length(vec<TSize, T> v) { return v.Length(); }
 		template <unsigned int TSize, typename T>
 		vec<TSize, T> Distance(vec<TSize, T> v, vec<TSize, T> v1) { return Length(v - v1); }
+		template <unsigned int TSize, typename T>
+		vec<TSize, T> Normalize(vec<TSize, T> v)
+		{
+			float l = v.Length();
+			if (l != 0)
+				v /= l;
+			return v;
+		}
+		template <unsigned int TSize, typename T>
+		vec<TSize, T> Round(vec<TSize, T> v)
+		{
+			for (T &v : v.value)
+				v = Maths::Round(v);
+			return v;
+		}
+		template <unsigned int TSize, typename T>
+		vec<TSize, T> Ceil(vec<TSize, T> v)
+		{
+			for (T &v : v.value)
+				v = Maths::Ceil(v);
+			return *this;
+		}
 
 		template <unsigned int TSize, typename T>
-		vec<TSize, T> Normalize(vec<TSize, T> v) { return v.Normalize(); }
+		vec<TSize, T> &Abs(vec<TSize, T> v)
+		{
+			for (T &v : v.value)
+				v = Maths::Abs(v);
+			return v;
+		}
 		template <unsigned int TSize, typename T>
-		vec<TSize, T> Round(vec<TSize, T> v) { return v.Round(); }
+		vec<TSize, T> &Sign(vec<TSize, T> v)
+		{
+			for (T &v : v.value)
+				v = Maths::Sign(v);
+			return v;
+		}
 		template <unsigned int TSize, typename T>
-		vec<TSize, T> Ceil(vec<TSize, T> v) { return v.Ceil(); }
+		vec<TSize, T> &Clamp(vec<TSize, T> v, const vec<TSize, T> &min, const vec<TSize, T> &max)
+		{
+			for (int i = 0; i < TSize; i++)
+				v[i] = Maths::Clamp(v[i], min[i], max[i]);
+			return v;
+		}
 		template <unsigned int TSize, typename T>
-		vec<TSize, T> Abs(vec<TSize, T> v) { return v.Abs(); }
-		template <unsigned int TSize, typename T>
-		vec<TSize, T> Sign(vec<TSize, T> v) { return v.Sign(); }
-		template <unsigned int TSize, typename T>
-		vec<TSize, T> Clamp(vec<TSize, T> v, const vec<TSize, T> &min, const vec<TSize, T> &max) { return v.Clamp(min, max); }
-		template <unsigned int TSize, typename T>
-		vec<TSize, T> Wrap(vec<TSize, T> v, const vec<TSize, T> &min, const vec<TSize, T> &max) { return v.Wrap(min, max); }
+		vec<TSize, T> &Wrap(vec<TSize, T> v, const vec<TSize, T> &min, const vec<TSize, T> &max)
+		{
+			for (int i = 0; i < TSize; i++)
+				v[i] = Maths::Wrap(v[i], min[i], max[i]);
+			return v;
+		}
 		template <unsigned int TSize, typename T>
 		vec<TSize, T> Lerp(const vec<TSize, T> &a, const vec<TSize, T> &b, float k) { return Maths::Lerp(a, b, k); }
 

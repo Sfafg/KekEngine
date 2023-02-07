@@ -22,6 +22,9 @@ VertexArray<Vertex, unsigned char> mesh2;
 Shader shader2;
 void Kek::Setup()
 {
+    vec2i a(10, 10);
+    vec2i b(20,10);
+    Log(a < b);
     mesh.AddVertices({{vec2f(0.03f, 0.05f), vec3f(1, 1, 0)},
                       {vec2f(0.03f, -0.05f), vec3f(1, 0, 0)},
                       {vec2f(-0.03f, 0.05f), vec3f(0, 1, 0)},

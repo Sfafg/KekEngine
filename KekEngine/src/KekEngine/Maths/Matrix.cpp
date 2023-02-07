@@ -162,7 +162,7 @@ namespace Kek
 	mat3x3 Matrix::Pivot(vec2f pivot, vec2f scale, float rotation)
 	{
 		mat3x3 mat = mat3x3();
-		mat.Translate(pivot * -1);
+		mat.Translate(-pivot);
 		mat.Scale(scale);
 		mat.Rotate(rotation);
 		mat.Translate(pivot);
@@ -171,7 +171,7 @@ namespace Kek
 	mat4x4 Matrix::Pivot(vec3f pivot, vec3f scale, vec3f rotation)
 	{
 		mat4x4 mat = mat4x4();
-		mat.Translate(pivot * -1);
+		mat.Translate(-pivot);
 		mat.Rotate(scale);
 		mat.Rotate(rotation);
 		mat.Translate(pivot);
