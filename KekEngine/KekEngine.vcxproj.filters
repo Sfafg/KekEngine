@@ -30,9 +30,6 @@
     <ClCompile Include="src\KekEngine\Maths\Byte.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\KekEngine\Maths\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\KekEngine\Maths\Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,9 +37,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\KekEngine\Maths\Matrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\KekEngine\Maths\Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\KekEngine\Maths\Vector.cpp">
@@ -101,9 +95,6 @@
     <ClInclude Include="src\KekEngine\Maths\Byte.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\KekEngine\Maths\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\KekEngine\Maths\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -111,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\KekEngine\Maths\Matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\KekEngine\Maths\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\KekEngine\Maths\Vector.h">

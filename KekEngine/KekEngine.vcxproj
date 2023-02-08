@@ -279,11 +279,9 @@
     <ClCompile Include="src\KekEngine\Core\Window.cpp" />
     <ClCompile Include="src\KekEngine\Graphics\VertexLayout.cpp" />
     <ClCompile Include="src\KekEngine\Maths\Byte.cpp" />
-    <ClCompile Include="src\KekEngine\Maths\Camera.cpp" />
     <ClCompile Include="src\KekEngine\Maths\Color.cpp" />
     <ClCompile Include="src\KekEngine\Maths\Maths.cpp" />
     <ClCompile Include="src\KekEngine\Maths\Matrix.cpp" />
-    <ClCompile Include="src\KekEngine\Maths\Transform.cpp" />
     <ClCompile Include="src\KekEngine\Maths\Vector.cpp" />
     <ClCompile Include="src\KekEngine\SystemIO\SystemIO.cpp" />
     <ClCompile Include="ThridParty\GLAD\glad\src\glad.c" />
@@ -313,11 +311,9 @@
     <ClInclude Include="src\KekEngine\Graphics\VertexArray.h" />
     <ClInclude Include="src\KekEngine\Graphics\VertexLayout.h" />
     <ClInclude Include="src\KekEngine\Maths\Byte.h" />
-    <ClInclude Include="src\KekEngine\Maths\Camera.h" />
     <ClInclude Include="src\KekEngine\Maths\Color.h" />
     <ClInclude Include="src\KekEngine\Maths\Maths.h" />
     <ClInclude Include="src\KekEngine\Maths\Matrix.h" />
-    <ClInclude Include="src\KekEngine\Maths\Transform.h" />
     <ClInclude Include="src\KekEngine\Maths\Vector.h" />
     <ClInclude Include="src\KekEngine\Core\Windows_Keys.h" />
     <ClInclude Include="src\KekEngine\SystemIO\PlatformIO.h" />
