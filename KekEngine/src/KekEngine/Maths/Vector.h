@@ -79,18 +79,12 @@ namespace Kek
 		OPERATOR(/=)
 #undef OPERATOR
 
-#define OPERATOR(operand)                          \
-	template <typename TO>                         \
-	void operator operand(const vec<TSize, TO> &v) \
-	{                                              \
-		for (int i = 0; i < TSize; i++)            \
-			operator[](i) operand v[i];            \
-	}
-		OPERATOR(+=)
-		OPERATOR(-=)
-		OPERATOR(*=)
-		OPERATOR(/=)
-#undef OPERATOR
+		template <typename TO>
+		void operator-=(const TO &v)
+		{
+			for (T &val : this->value)
+				val -= v;
+		}
 
 #define OPERATOR(operand)                                \
 	vec<TSize, T> operator operand(const T &other) const \
@@ -286,6 +280,7 @@ namespace Kek
 
 	namespace Vector
 	{
+
 		template <unsigned int TSize, typename T>
 		vec<TSize, T> Length(vec<TSize, T> v) { return v.Length(); }
 		template <unsigned int TSize, typename T>
