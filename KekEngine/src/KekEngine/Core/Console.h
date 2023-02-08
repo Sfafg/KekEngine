@@ -9,8 +9,8 @@ namespace Kek
 	{
 	public:
 		static bool isValidName(const std::string &str);
-		colRGB8i operator[](const std::string &str);
-		colRGB8i operator[](int ind);
+		rgb8i operator[](const std::string &str);
+		rgb8i operator[](int ind);
 	};
 
 	class IConsole
@@ -32,16 +32,16 @@ namespace Kek
 		virtual void ShowCursor(bool show) = 0;
 		virtual void SetCursorPosition(vec2i pos) = 0;
 		virtual void SetIndention(int indention) = 0;
-		virtual void SetColor(const colRGB8i &col) = 0;
-		virtual void SetBackColor(const colRGB8i &col) = 0;
+		virtual void SetColor(const rgb8i &col) = 0;
+		virtual void SetBackColor(const rgb8i &col) = 0;
 		virtual void SetBold(bool state) = 0;
 		virtual void SetUnderline(bool state) = 0;
 		virtual void SetDefault() = 0;
 
 		virtual vec2i GetCursorPosition() = 0;
 		virtual int GetIndention() = 0;
-		virtual colRGB8i GetColor() = 0;
-		virtual colRGB8i GetBackColor() = 0;
+		virtual rgb8i GetColor() = 0;
+		virtual rgb8i GetBackColor() = 0;
 		virtual bool GetBold() = 0;
 		virtual bool GetUnderline() = 0;
 
@@ -52,8 +52,8 @@ namespace Kek
 
 	class WindowsConsole : public IConsole
 	{
-		colRGB8i fontCol = colRGB8i(192, 192, 192);
-		colRGB8i backCol = colRGB8i(0, 0, 0);
+		rgb8i fontCol = rgb8i(192, 192, 192);
+		rgb8i backCol = rgb8i(0, 0, 0);
 		bool isBold = false;
 		bool isUnderline = false;
 		unsigned char indentionLevel = 0;
@@ -65,16 +65,16 @@ namespace Kek
 		void ShowCursor(bool show);
 		void SetCursorPosition(vec2i pos);
 		void SetIndention(int indention);
-		void SetColor(const colRGB8i &col);
-		void SetBackColor(const colRGB8i &col);
+		void SetColor(const rgb8i &col);
+		void SetBackColor(const rgb8i &col);
 		void SetBold(bool state);
 		void SetUnderline(bool state);
 		void SetDefault();
 
 		vec2i GetCursorPosition();
 		int GetIndention();
-		colRGB8i GetColor();
-		colRGB8i GetBackColor();
+		rgb8i GetColor();
+		rgb8i GetBackColor();
 		bool GetBold();
 		bool GetUnderline();
 
@@ -94,16 +94,16 @@ namespace Kek
 		void ShowCursor(bool show);
 		void SetCursorPosition(vec2i pos);
 		void SetIndention(int indention);
-		void SetColor(const colRGB8i &col);
-		void SetBackColor(const colRGB8i &col);
+		void SetColor(const rgb8i &col);
+		void SetBackColor(const rgb8i &col);
 		void SetBold(bool state);
 		void SetUnderline(bool state);
 		void SetDefault();
 
 		vec2i GetCursorPosition();
 		int GetIndention();
-		colRGB8i GetColor();
-		colRGB8i GetBackColor();
+		rgb8i GetColor();
+		rgb8i GetBackColor();
 		bool GetBold();
 		bool GetUnderline();
 

@@ -452,41 +452,41 @@ namespace Kek
 		}
 	}
 
-	struct colRGB : public col<3>
+	struct rgb : public col<3>
 	{
-		colRGB();
-		colRGB(float r, float g, float b);
-		explicit colRGB(int v);
-		explicit colRGB(const std::string_view &v);
+		rgb();
+		rgb(float r, float g, float b);
+		explicit rgb(int v);
+		explicit rgb(const std::string_view &v);
 		template <unsigned int TSize, typename T>
-		colRGB(const col<TSize, T> &v) : col(v) {}
+		rgb(const col<TSize, T> &v) : col(v) {}
 	};
-	struct colRGBA : public col<4>
+	struct rgba : public col<4>
 	{
-		colRGBA();
-		colRGBA(float r, float g, float b, float a);
-		explicit colRGBA(int v);
-		explicit colRGBA(const std::string_view &v);
+		rgba();
+		rgba(float r, float g, float b, float a);
+		explicit rgba(int v);
+		explicit rgba(const std::string_view &v);
 		template <unsigned int TSize, typename T>
-		colRGBA(const col<TSize, T> &v) : col(v) {}
+		rgba(const col<TSize, T> &v) : col(v) {}
 	};
 
-	struct colRGB8i : public col<3, unsigned char>
+	struct rgb8i : public col<3, unsigned char>
 	{
-		colRGB8i();
-		colRGB8i(unsigned char r, unsigned char g, unsigned char b);
-		explicit colRGB8i(int v);
-		explicit colRGB8i(const std::string_view &v);
+		rgb8i();
+		rgb8i(unsigned char r, unsigned char g, unsigned char b);
+		explicit rgb8i(int v);
+		explicit rgb8i(const std::string_view &v);
 		template <unsigned int TSize, typename T>
-		colRGB8i(const col<TSize, T> &v) : col(v) {}
+		rgb8i(const col<TSize, T> &v) : col(v) {}
 	};
-	struct colRGBA8i : public col<4, unsigned char>
+	struct rgba8i : public col<4, unsigned char>
 	{
-		colRGBA8i();
-		colRGBA8i(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-		explicit colRGBA8i(int v);
-		explicit colRGBA8i(const std::string_view &v);
+		rgba8i();
+		rgba8i(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+		explicit rgba8i(int v);
+		explicit rgba8i(const std::string_view &v);
 		template <unsigned int TSize, typename T>
-		colRGBA8i(const col<TSize, T> &v) : col(v) {}
+		rgba8i(const col<TSize, T> &v) : col(v) {}
 	};
 }

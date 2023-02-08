@@ -1,4 +1,5 @@
 #include "KekEngine/Core/Log.h"
+#include "KekEngine/Maths/Color.h"
 #include "KekEngine/Core/Application.h"
 #include "KekEngine/Graphics/GraphicsAPI.h"
 #include "KekEngine/Graphics/Shaders.h"
@@ -22,6 +23,11 @@ VertexArray<Vertex, unsigned char> mesh2;
 Shader shader2;
 void Kek::Setup()
 {
+    rgb a(0.1f, 0.1f, 0.1f);
+    rgb b(0.1f, 0.1f, 0.1f);
+
+    Log(a < b);
+
     mesh.AddVertices({{vec2f(0.03f, 0.05f), vec3f(1, 1, 0)},
                       {vec2f(0.03f, -0.05f), vec3f(1, 0, 0)},
                       {vec2f(-0.03f, 0.05f), vec3f(0, 1, 0)},
@@ -60,8 +66,4 @@ void Kek::Update()
         }
         app[i].SwapBuffers();
     }
-
-
-
-    
 }

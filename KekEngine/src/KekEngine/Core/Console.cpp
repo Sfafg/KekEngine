@@ -7,25 +7,25 @@
 namespace Kek
 {
 	ColorTable IConsole::colorTable;
-	colRGB8i &TableColor(int index)
+	rgb8i &TableColor(int index)
 	{
-		static colRGB8i colorTable[]{
-			colRGB8i(242, 242, 242),
-			colRGB8i(12, 12, 12),
-			colRGB8i(0, 55, 218),
-			colRGB8i(19, 161, 14),
-			colRGB8i(58, 150, 221),
-			colRGB8i(197, 15, 31),
-			colRGB8i(136, 23, 152),
-			colRGB8i(193, 156, 0),
-			colRGB8i(118, 118, 118),
-			colRGB8i(192, 192, 192),
-			colRGB8i(59, 120, 255),
-			colRGB8i(22, 198, 12),
-			colRGB8i(97, 214, 214),
-			colRGB8i(231, 72, 86),
-			colRGB8i(180, 0, 158),
-			colRGB8i(249, 241, 165)};
+		static rgb8i colorTable[]{
+			rgb8i(242, 242, 242),
+			rgb8i(12, 12, 12),
+			rgb8i(0, 55, 218),
+			rgb8i(19, 161, 14),
+			rgb8i(58, 150, 221),
+			rgb8i(197, 15, 31),
+			rgb8i(136, 23, 152),
+			rgb8i(193, 156, 0),
+			rgb8i(118, 118, 118),
+			rgb8i(192, 192, 192),
+			rgb8i(59, 120, 255),
+			rgb8i(22, 198, 12),
+			rgb8i(97, 214, 214),
+			rgb8i(231, 72, 86),
+			rgb8i(180, 0, 158),
+			rgb8i(249, 241, 165)};
 
 		return colorTable[index];
 	}
@@ -56,16 +56,16 @@ namespace Kek
 	{
 		return ColorMap().contains(str);
 	}
-	colRGB8i ColorTable::operator[](const std::string &str)
+	rgb8i ColorTable::operator[](const std::string &str)
 	{
 		auto search = ColorMap().find(str);
 		if (search == ColorMap().end())
 		{
-			return colRGB8i(255, 255, 255);
+			return rgb8i(255, 255, 255);
 		}
 		return TableColor(search->second);
 	}
-	colRGB8i ColorTable::operator[](int ind)
+	rgb8i ColorTable::operator[](int ind)
 	{
 		return TableColor(ind);
 	}
@@ -108,7 +108,7 @@ namespace Kek
 
 		return windowsColorTable[index];
 	}
-	void SetWindowsConsoleColor(const colRGB8i &font, const colRGB8i &background)
+	void SetWindowsConsoleColor(const rgb8i &font, const rgb8i &background)
 	{
 		int fontIndex = 0;
 		int backIndex = 0;
@@ -152,12 +152,12 @@ namespace Kek
 	{
 		indentionLevel = Maths::Clamp(indention, 0, 255);
 	}
-	void WindowsConsole::SetColor(const colRGB8i &col)
+	void WindowsConsole::SetColor(const rgb8i &col)
 	{
 		fontCol = col;
 		SetWindowsConsoleColor(fontCol, backCol);
 	}
-	void WindowsConsole::SetBackColor(const colRGB8i &col)
+	void WindowsConsole::SetBackColor(const rgb8i &col)
 	{
 		backCol = col;
 		SetWindowsConsoleColor(fontCol, backCol);
@@ -181,8 +181,8 @@ namespace Kek
 	void WindowsConsole::SetDefault()
 	{
 		indentionLevel = 0;
-		fontCol = colRGB8i(192, 192, 192);
-		backCol = colRGB8i(0, 0, 0);
+		fontCol = rgb8i(192, 192, 192);
+		backCol = rgb8i(0, 0, 0);
 		isBold = false;
 		isUnderline = false;
 		std::cout << "\033[0m";
@@ -204,11 +204,11 @@ namespace Kek
 	{
 		return indentionLevel;
 	}
-	colRGB8i WindowsConsole::GetColor()
+	rgb8i WindowsConsole::GetColor()
 	{
 		return fontCol;
 	}
-	colRGB8i WindowsConsole::GetBackColor()
+	rgb8i WindowsConsole::GetBackColor()
 	{
 		return backCol;
 	}
@@ -272,10 +272,10 @@ namespace Kek
 	{
 		indentionLevel = Maths::Clamp(indention, 0, 255);
 	}
-	void FileConsole::SetColor(const colRGB8i &col)
+	void FileConsole::SetColor(const rgb8i &col)
 	{
 	}
-	void FileConsole::SetBackColor(const colRGB8i &col)
+	void FileConsole::SetBackColor(const rgb8i &col)
 	{
 	}
 	void FileConsole::SetBold(bool state)
@@ -293,13 +293,13 @@ namespace Kek
 		return vec2i();
 	}
 	int FileConsole::GetIndention() { return indentionLevel; }
-	colRGB8i FileConsole::GetColor()
+	rgb8i FileConsole::GetColor()
 	{
-		return colRGB8i();
+		return rgb8i();
 	}
-	colRGB8i FileConsole::GetBackColor()
+	rgb8i FileConsole::GetBackColor()
 	{
-		return colRGB8i();
+		return rgb8i();
 	}
 	bool FileConsole::GetBold()
 	{
